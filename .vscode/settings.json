@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "**/.cache": true,
+    "**/.cenv": true,
+    "**/elm-stuff": true
+  }
+}
