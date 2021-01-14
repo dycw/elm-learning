@@ -4290,7 +4290,7 @@ type alias Process =
               _List_fromArray([$elm$html$Html$text("DMI")])
             ),
             $elm$html$Html$text(
-              "\n                ) is a micro-cap regional paper and office\n                supply distributor with an emphasis on servicinge\n                small-business clients.\n                "
+              "\n                ) is a micro-cap regional paper and office\n                supply distributor with an emphasis on servicing\n                small-business clients.\n                "
             ),
           ])
         ),
