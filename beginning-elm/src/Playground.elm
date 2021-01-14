@@ -1,10 +1,13 @@
 module Playground exposing
-    ( doubleScores
+    ( add
+    , doubleScores
+    , guardiansWithShortNames
     , highestScores
     , main
     , scoresLessThan320
     )
 
+import Example exposing (guardianNames)
 import Html
 import Regex
 
@@ -42,6 +45,7 @@ computeTime startTime endTime =
     endTime - startTime
 
 
+add : number -> number -> number
 add a b =
     a + b
 
@@ -200,6 +204,47 @@ scoresLessThan320 scores =
 
 isLessThan320 score =
     score < 320
+
+
+guardiansWithShortNames : List String -> Int
+guardiansWithShortNames guardians =
+    guardians
+        |> List.map String.length
+        |> List.filter (\x -> x < 6)
+        |> List.length
+
+
+type Greeting
+    = Howdy
+    | Hola
+    | Namaste
+    | NumericalHi Int Int
+
+
+sayHello : Greeting -> String
+sayHello greeting =
+    case greeting of
+        Howdy ->
+            "How y'all doin'?"
+
+        Hola ->
+            "Hola amigo!"
+
+        Namaste message ->
+            message
+
+        NumericalHi value1 value2 ->
+            value1 + value2 |> String.fromInt
+
+
+welcomeMessage : Bool -> String
+welcomeMessage isLoggedIn =
+    case isLoggedIn of
+        True ->
+            "Welcome to my awesome site!"
+
+        False ->
+            "Please log in."
 
 
 main =
