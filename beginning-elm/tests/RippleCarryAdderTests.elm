@@ -126,4 +126,32 @@ rippleCarryAdderTests =
                     rippleCarryAdder 0 0 1
                         |> Expect.equal 1
             ]
+        , fuzz3
+            (list (intRange 0 1))
+            (list (intRange 0 1))
+            (intRange 0 1)
+            "carry-out is 0 when most significant digits are both 0"
+          <|
+            \list1 list2 carryIn ->
+                let
+                    convertToBinary digitsList =
+                        digitsList
+                            |> List.take 3
+                            |> numberFromDigits
+
+                    firstInput =
+                        convertToBinary list1
+
+                    secondInput =
+                        convertToBinary list2
+                in
+                rippleCarryAdder firstInput secondInput carryIn
+                    |> digits
+                    |> List.length
+                    |> Expect.lessThan 5
         ]
+
+
+numberFromDigits : List Int -> Int
+numberFromDigits digitsList =
+    List.foldl (\digit number -> digit + 10 * number) 0 digitsList
