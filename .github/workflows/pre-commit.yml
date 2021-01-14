@@ -9,22 +9,13 @@ jobs:
   pre-commit:
     name: pre-commit (${{ matrix.os }}, ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash -l {0}
     strategy:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.9]
     steps:
       - uses: actions/checkout@v2
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: actions/setup-python@v2
         with:
-          activate-environment: elm-learning
-          environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
-      - run: |
-          cd beginning-elm
-          npm install
-          pre-commit run --all-files
+      - uses: pre-commit/action@v2.0.0
