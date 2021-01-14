@@ -1,0 +1,2 @@
+[tool.nitpick]
+style = "https://raw.githubusercontent.com/dycw/nitpick/master/styles/basic.toml"
