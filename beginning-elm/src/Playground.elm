@@ -49,8 +49,5 @@ divide e f =
 
 
 main =
-    divide 30 10
-        |> multiply 10
-        |> add 5
-        |> String.fromFloat
+    escapeEarth 10 6 "low"
         |> Html.text
