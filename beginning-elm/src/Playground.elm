@@ -5,6 +5,7 @@ module Playground exposing
     , highestScores
     , main
     , scoresLessThan320
+    , signUp
     )
 
 import Example exposing (guardianNames)
@@ -273,6 +274,51 @@ signUp email ageStr =
 
             else
                 Err "You entered an invalid email."
+
+
+type alias Character =
+    { name : String
+    , age : Maybe Int
+    }
+
+
+sansa : Character
+sansa =
+    { name = "Sansa"
+    , age = Just 19
+    }
+
+
+arya : Character
+arya =
+    { name = "Arya"
+    , age = Nothing
+    }
+
+
+getAdultAge : Character -> Maybe Int
+getAdultAge character =
+    case character.age of
+        Nothing ->
+            Nothing
+
+        Just age ->
+            if age >= 18 then
+                Just age
+
+            else
+                Nothing
+type MyList a
+    = Node a (MyList a)
+
+sum : MyList Int -> Int
+sum myList =
+    case myList of
+        Empty ->
+            0
+
+        Node intValue remainingNodes ->
+            intValue + sum remainingNodes
 
 
 main =
