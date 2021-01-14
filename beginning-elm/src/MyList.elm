@@ -18,6 +18,11 @@ sum myList =
 
 isEmpty : MyList a -> Bool
 isEmpty xs =
+    isItReallyEmpty xs
+
+
+isItReallyEmpty : MyList a -> Bool
+isItReallyEmpty xs =
     case xs of
         Empty ->
             True

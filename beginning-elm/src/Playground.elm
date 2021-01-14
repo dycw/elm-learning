@@ -8,8 +8,8 @@ module Playground exposing
     , signUp
     )
 
-import Example exposing (guardianNames)
-import Html
+import Html exposing (Html, text)
+import MyList exposing (MyList(..), isEmpty)
 import Regex
 
 
@@ -218,7 +218,7 @@ guardiansWithShortNames guardians =
 type Greeting
     = Howdy
     | Hola
-    | Namaste
+    | Namaste String
     | NumericalHi Int Int
 
 
@@ -308,20 +308,20 @@ getAdultAge character =
 
             else
                 Nothing
-type MyList a
-    = Node a (MyList a)
-
-sum : MyList Int -> Int
-sum myList =
-    case myList of
-        Empty ->
-            0
-
-        Node intValue remainingNodes ->
-            intValue + sum remainingNodes
 
 
+list1 : MyList a
+list1 =
+    Empty
+
+
+list2 : MyList number
+list2 =
+    Node 9 Empty
+
+
+main : Html.Html msg
 main =
-    multiplyByFive 3
+    isEmpty list2
         |> Debug.toString
         |> Html.text
