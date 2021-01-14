@@ -11,8 +11,8 @@ escapeEarth myVelocity mySpeed fuelStatus =
         orbitalSpeedInKmPerSec =
             7.67
 
-        whereToLand fuel =
-            if fuel == "low" then
+        whereToLand =
+            if fuelStatus == "low" then
                 "Land on droneship"
 
             else
@@ -49,5 +49,5 @@ divide e f =
 
 
 main =
-    escapeEarth 10 "low"
+    escapeEarth 10 6.7 "low"
         |> Html.text
