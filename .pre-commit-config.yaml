@@ -25,3 +25,12 @@ repos:
         args: [--fix=lf]
       - id: no-commit-to-branch
       - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: elm-format
+        name: elm-format
+        language: system
+        entry: elm-format
+        files: \.elm$
+        args: [--yes]
