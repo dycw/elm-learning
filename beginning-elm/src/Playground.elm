@@ -25,7 +25,7 @@ escapeEarth myVelocity mySpeed fuelStatus =
         "Stay in orbit"
 
     else
-        whereToLand fuelStatus
+        whereToLand
 
 
 computeSpeed distance time =
@@ -48,6 +48,33 @@ divide e f =
     e / f
 
 
+weekday dayInNumber =
+    case dayInNumber of
+        0 ->
+            "Sunday"
+
+        1 ->
+            "Monday"
+
+        2 ->
+            "Tuesday"
+
+        3 ->
+            "Wednesday"
+
+        4 ->
+            "Thursday"
+
+        5 ->
+            "Friday"
+
+        6 ->
+            "Saturday"
+
+        _ ->
+            "Unknown day"
+
+
 main =
-    escapeEarth 10 6.7 "low"
+    weekday 5
         |> Html.text
