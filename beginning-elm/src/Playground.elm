@@ -1,4 +1,9 @@
-module Playground exposing (main)
+module Playground exposing
+    ( doubleScores
+    , highestScores
+    , main
+    , scoresLessThan320
+    )
 
 import Html
 import Regex
@@ -175,6 +180,26 @@ multiplyByFive number =
             5
     in
     number * multiplier
+
+
+scoreMultiplier =
+    2
+
+
+highestScores =
+    [ 316, 320, 312, 370, 337, 318, 314 ]
+
+
+doubleScores scores =
+    List.map (\x -> x * scoreMultiplier) scores
+
+
+scoresLessThan320 scores =
+    List.filter isLessThan320 scores
+
+
+isLessThan320 score =
+    score < 320
 
 
 main =
