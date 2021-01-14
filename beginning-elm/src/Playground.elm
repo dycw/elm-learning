@@ -49,5 +49,5 @@ divide e f =
 
 
 main =
-    escapeEarth 10 6 "low"
+    escapeEarth 10 "low"
         |> Html.text
