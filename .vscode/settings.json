@@ -2,6 +2,7 @@
   "files.exclude": {
     "**/.cache": true,
     "**/.cenv": true,
+    "**/.vscode": true,
     "**/elm-stuff": true
   }
 }
