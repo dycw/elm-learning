@@ -1,8 +1,9 @@
-module FuzzTests exposing (addOneTests, addTests, arrayGetTests, arrayGetTests2, flipTests, listLengthTests, multiplyFloatTests, pizzaLeftTests, stringTests)
+module FuzzTests exposing (addOneTests, addTests, arrayGetTests, flipTests, listLengthTests, listReverseTests, multiplyFloatTests, pizzaLeftTests, stringTests)
 
 import Array
 import Expect exposing (Expectation)
 import Fuzz exposing (..)
+import Http exposing (Expect)
 import Test exposing (..)
 
 
@@ -147,8 +148,8 @@ listLengthTests =
         ]
 
 
-arrayGetTests2 : Test
-arrayGetTests2 =
+arrayGetTests : Test
+arrayGetTests =
     describe "Array.get"
         [ fuzz (array (intRange -20 20)) "returns Nothing for out of range index" <|
             \intArray ->
@@ -159,9 +160,29 @@ arrayGetTests2 =
                 intArray
                     |> Array.get length
                     |> Expect.equal Nothing
-        ]
-        [ fuzz (tuple ( int, int )) "adds two given integers" <|
+        , fuzz (tuple ( int, int )) "adds two given integers (tuple)" <|
             \( num1, num2 ) ->
                 add num1 num2
                     |> Expect.equal (num1 + num2)
+        , fuzz2 int int "adds two given integers (fuzz2)" <|
+            \num1 num2 ->
+                add num1 num2 |> Expect.equal (num1 + num2)
+        ]
+
+
+listReverseTests : Test
+listReverseTests =
+    describe "List.reverse"
+        [ fuzz (tuple ( list int, int )) "doesn't remove a member of the list" <|
+            \( intList, num ) ->
+                intList
+                    |> List.reverse
+                    |> List.member num
+                    |> Expect.equal (List.member num intList)
+        , fuzz2 (list int) int "doesn't remove a member of the list (fuzz2)" <|
+            \intList num ->
+                intList
+                    |> List.reverse
+                    |> List.member num
+                    |> Expect.equal (List.member num intList)
         ]
