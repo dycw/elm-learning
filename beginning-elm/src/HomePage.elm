@@ -13,7 +13,7 @@ view model =
             , text <|
                 """
                 ) is a micro-cap regional paper and office
-                supply distributor with an emphasis on servicinge
+                supply distributor with an emphasis on servicing
                 small-business clients.
                 """
             ]
