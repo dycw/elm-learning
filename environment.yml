@@ -1,0 +1,7 @@
+name: elm-learning
+
+dependencies:
+  - python = 3.9
+  - pip
+  - pip:
+      - --requirement=.pre-commit-hooks/python/requirements.txt
