@@ -238,16 +238,6 @@ sayHello greeting =
             value1 + value2 |> String.fromInt
 
 
-welcomeMessage : Bool -> String
-welcomeMessage isLoggedIn =
-    case isLoggedIn of
-        True ->
-            "Welcome to my awesome site!"
-
-        False ->
-            "Please log in."
-
-
 signUp : String -> String -> Result String String
 signUp email ageStr =
     case String.toInt ageStr of
@@ -318,16 +308,6 @@ list1 =
 list2 : MyList number
 list2 =
     Node 9 Empty
-
-
-resultMap5Example : Result Json.Decode.Error Int
-resultMap5Example =
-    Result.map5 addFiveNumbers
-        (decodeString int "1")
-        (decodeString int "2")
-        (decodeString int "3")
-        (decodeString int "4")
-        (decodeString int "5")
 
 
 addFiveNumbers : Int -> Int -> Int -> Int -> Int -> Int
