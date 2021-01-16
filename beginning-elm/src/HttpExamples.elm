@@ -1,10 +1,10 @@
-module HttpExamples exposing (Model)
+module HttpExamples exposing (main)
 
 import Browser
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Http
-import Json.Encode exposing (int)
+import Json.Decode exposing (Decoder, Error(..), decodeString, list, string)
 
 
 type alias Model =
@@ -16,12 +16,8 @@ type alias Model =
 view : Model -> Html Msg
 view model =
     div []
-        [ button
-            [ onClick SendHttpRequest ]
+        [ button [ onClick SendHttpRequest ]
             [ text "Get data from server" ]
-
-        -- , h3 [] [ text "Old School Main Characters" ]
-        -- , ul [] (List.map viewNickname model.nicknames)
         , viewNicknamesOrError model
         ]
 
@@ -40,10 +36,11 @@ viewError : String -> Html Msg
 viewError errorMessage =
     let
         errorHeading =
-            "Couldn't fetch nicknames at this time"
+            "Couldn't fetch nicknames at this time."
     in
     div []
-        [ h3 [] [ text errorHeading, text ("Error:" ++ errorMessage) ]
+        [ h3 [] [ text errorHeading ]
+        , text ("Error: " ++ errorMessage)
         ]
 
 
@@ -62,36 +59,25 @@ viewNickname nickname =
 
 type Msg
     = SendHttpRequest
-    | DataReceived (Result Http.Error String)
+    | DataReceived (Result Http.Error (List String))
 
 
 url : String
 url =
-    "http://localhost:5016/old-school.txt"
+    "http://localhost:5019/nicknames"
 
 
 getNicknames : Cmd Msg
 getNicknames =
-    Http.get { url = url, expect = Http.expectString DataReceived }
+    Http.get
+        { url = url
+        , expect = Http.expectJson DataReceived nicknamesDecoder
+        }
 
 
-buildErrorMessage : Http.Error -> String
-buildErrorMessage error =
-    case error of
-        Http.BadUrl msg ->
-            msg
-
-        Http.Timeout ->
-            "Server is taking too long to respond."
-
-        Http.NetworkError ->
-            "Unable to reach server."
-
-        Http.BadStatus statusCode ->
-            "Request failed with status code: " ++ String.fromInt statusCode
-
-        Http.BadBody msg ->
-            msg
+nicknamesDecoder : Decoder (List String)
+nicknamesDecoder =
+    list string
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -100,15 +86,34 @@ update msg model =
         SendHttpRequest ->
             ( model, getNicknames )
 
-        DataReceived (Ok nicknamesStr) ->
-            let
-                nicknames =
-                    String.split "," nicknamesStr
-            in
+        DataReceived (Ok nicknames) ->
             ( { model | nicknames = nicknames }, Cmd.none )
 
         DataReceived (Err httpError) ->
-            ( { model | errorMessage = Just (buildErrorMessage httpError) }, Cmd.none )
+            ( { model
+                | errorMessage = Just (buildErrorMessage httpError)
+              }
+            , Cmd.none
+            )
+
+
+buildErrorMessage : Http.Error -> String
+buildErrorMessage httpError =
+    case httpError of
+        Http.BadUrl message ->
+            message
+
+        Http.Timeout ->
+            "Server is taking too long to respond. Please try again later."
+
+        Http.NetworkError ->
+            "Unable to reach server."
+
+        Http.BadStatus statusCode ->
+            "Request failed with status code: " ++ String.fromInt statusCode
+
+        Http.BadBody message ->
+            message
 
 
 init : () -> ( Model, Cmd Msg )
@@ -123,8 +128,7 @@ init _ =
 main : Program () Model Msg
 main =
     Browser.element
-        { init =
-            init
+        { init = init
         , view = view
         , update = update
         , subscriptions = \_ -> Sub.none
