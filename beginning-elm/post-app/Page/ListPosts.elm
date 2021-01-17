@@ -1,5 +1,6 @@
 module Page.ListPosts exposing (Model, Msg, init, update, view)
 
+import Error exposing (buildErrorMessage)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -80,53 +81,25 @@ viewPosts posts =
 viewTableHeader : Html Msg
 viewTableHeader =
     tr []
-        [ th []
-            [ text "ID" ]
-        , th []
-            [ text "Title" ]
-        , th []
-            [ text "Author" ]
+        [ th [] [ text "ID" ]
+        , th [] [ text "Title" ]
+        , th [] [ text "Author" ]
         ]
 
 
 viewPost : Post -> Html Msg
 viewPost post =
     tr []
-        [ td []
-            [ text (Post.idToString post.id) ]
-        , td []
-            [ text post.title ]
-        , td []
-            [ a [ href post.authorUrl ] [ text post.authorName ] ]
+        [ td [] [ text (Post.idToString post.id) ]
+        , td [] [ text post.title ]
+        , td [] [ a [ href post.authorUrl ] [ text post.authorName ] ]
+        , td [] [ a [ href ("/posts/" ++ Post.idToString post.id) ] [ text "Edit" ] ]
         ]
 
 
 viewFetchError : String -> Html Msg
-viewFetchError errorMessage =
-    let
-        errorHeading =
-            "Couldn't fetch posts at this time."
-    in
+viewFetchError string =
     div []
-        [ h3 [] [ text errorHeading ]
-        , text ("Error: " ++ errorMessage)
+        [ h3 [] [ text "Couldn't fetch posts at this time." ]
+        , text ("Error: " ++ string)
         ]
-
-
-buildErrorMessage : Http.Error -> String
-buildErrorMessage httpError =
-    case httpError of
-        Http.BadUrl message ->
-            message
-
-        Http.Timeout ->
-            "Server is taking too long to respond. Please try again later."
-
-        Http.NetworkError ->
-            "Unable to reach server."
-
-        Http.BadStatus statusCode ->
-            "Request failed with status code: " ++ String.fromInt statusCode
-
-        Http.BadBody message ->
-            message

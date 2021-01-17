@@ -1,7 +1,9 @@
-module Post exposing (Post, PostId, idToString, postDecoder, postsDecoder)
+module Post exposing (Post, PostId, idParser, idToString, postDecoder, postEncoder, postsDecoder)
 
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
+import Json.Encode as Encode
+import Url.Parser exposing (Parser, custom)
 
 
 type alias Post =
@@ -21,6 +23,21 @@ postsDecoder =
     list postDecoder
 
 
+postEncoder : Post -> Encode.Value
+postEncoder post =
+    Encode.object
+        [ ( "id", encodeId post.id )
+        , ( "title", Encode.string post.title )
+        , ( "authorName", Encode.string post.authorName )
+        , ( "authorUrl", Encode.string post.authorUrl )
+        ]
+
+
+encodeId : PostId -> Encode.Value
+encodeId (PostId id) =
+    Encode.int id
+
+
 postDecoder : Decoder Post
 postDecoder =
     Decode.succeed Post
@@ -35,13 +52,11 @@ idDecoder =
     Decode.map PostId int
 
 
+idParser : Parser (PostId -> a) a
+idParser =
+    custom "POSTID" <| \postId -> Maybe.map PostId (String.toInt postId)
+
+
 idToString : PostId -> String
 idToString (PostId id) =
     String.fromInt id
-
-
-
--- --view
--- viewPost : Post -> Html Msg
--- viewPost post =
---     tr [] [ td [ text (idToString post.id) ] ]

@@ -4,6 +4,7 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (title)
+import Page.EditPost as EditPost
 import Page.ListPosts as ListPosts
 import Route exposing (Route)
 import Url exposing (Url)
@@ -20,11 +21,13 @@ type Msg
     = ListPageMsg ListPosts.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
+    | EditPageMsg EditPost.Msg
 
 
 type Page
     = NotFoundPage
     | ListPage ListPosts.Model
+    | EditPage EditPost.Model
 
 
 
@@ -57,6 +60,13 @@ initCurrentPage ( model, existingCmds ) =
                             ListPosts.init
                     in
                     ( ListPage pageModel, Cmd.map ListPageMsg pageCmds )
+
+                Route.Post postId ->
+                    let
+                        ( pageModel, pageCmd ) =
+                            EditPost.init postId model.navKey
+                    in
+                    ( EditPage pageModel, Cmd.map EditPageMsg pageCmd )
     in
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
@@ -81,8 +91,10 @@ currentView model =
             notFoundView
 
         ListPage pageModel ->
-            ListPosts.view pageModel
-                |> Html.map ListPageMsg
+            ListPosts.view pageModel |> Html.map ListPageMsg
+
+        EditPage pageModel ->
+            EditPost.view pageModel |> Html.map EditPageMsg
 
 
 notFoundView : Html msg
@@ -115,12 +127,17 @@ update msg model =
                     ( model, Nav.load url )
 
         ( UrlChanged url, _ ) ->
-            let
-                newRoute =
-                    Route.parseUrl url
-            in
-            ( { model | route = newRoute }, Cmd.none )
+            ( { model | route = Route.parseUrl url }, Cmd.none )
                 |> initCurrentPage
+
+        ( EditPageMsg subMsg, EditPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    EditPost.update subMsg pageModel
+            in
+            ( { model | page = EditPage updatedPageModel }
+            , Cmd.map EditPageMsg updatedCmd
+            )
 
         ( _, _ ) ->
             ( model, Cmd.none )
