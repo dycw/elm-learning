@@ -6689,8 +6689,12 @@ type alias Process =
             ),
             url: "http://localhost:5019/posts/",
           });
+          var $author$project$Page$ListPosts$initialModel = {
+            deleteError: $elm$core$Maybe$Nothing,
+            posts: $krisajenkins$remotedata$RemoteData$Loading,
+          };
           var $author$project$Page$ListPosts$init = _Utils_Tuple2(
-            { posts: $krisajenkins$remotedata$RemoteData$Loading },
+            $author$project$Page$ListPosts$initialModel,
             $author$project$Page$ListPosts$fetchPosts
           );
           var $elm$core$Platform$Cmd$map = _Platform_map;
@@ -7364,20 +7368,69 @@ type alias Process =
                 }
             }
           });
+          var $author$project$Page$ListPosts$PostDeleted = function (a) {
+            return { $: "PostDeleted", a: a };
+          };
+          var $elm$http$Http$expectString = function (toMsg) {
+            return A2(
+              $elm$http$Http$expectStringResponse,
+              toMsg,
+              $elm$http$Http$resolve($elm$core$Result$Ok)
+            );
+          };
+          var $author$project$Page$ListPosts$deletePost = function (postId) {
+            return $elm$http$Http$request({
+              body: $elm$http$Http$emptyBody,
+              expect: $elm$http$Http$expectString(
+                $author$project$Page$ListPosts$PostDeleted
+              ),
+              headers: _List_Nil,
+              method: "DELETE",
+              timeout: $elm$core$Maybe$Nothing,
+              tracker: $elm$core$Maybe$Nothing,
+              url:
+                "http://localhost:5019/posts/" +
+                $author$project$Post$idToString(postId),
+            });
+          };
           var $author$project$Page$ListPosts$update = F2(function (msg, model) {
-            if (msg.$ === "FetchPosts") {
-              return _Utils_Tuple2(
-                _Utils_update(model, {
-                  posts: $krisajenkins$remotedata$RemoteData$Loading,
-                }),
-                $author$project$Page$ListPosts$fetchPosts
-              );
-            } else {
-              var response = msg.a;
-              return _Utils_Tuple2(
-                _Utils_update(model, { posts: response }),
-                $elm$core$Platform$Cmd$none
-              );
+            switch (msg.$) {
+              case "FetchPosts":
+                return _Utils_Tuple2(
+                  _Utils_update(model, {
+                    posts: $krisajenkins$remotedata$RemoteData$Loading,
+                  }),
+                  $author$project$Page$ListPosts$fetchPosts
+                );
+              case "PostsReceived":
+                var response = msg.a;
+                return _Utils_Tuple2(
+                  _Utils_update(model, { posts: response }),
+                  $elm$core$Platform$Cmd$none
+                );
+              case "DeletePost":
+                var postId = msg.a;
+                return _Utils_Tuple2(
+                  model,
+                  $author$project$Page$ListPosts$deletePost(postId)
+                );
+              default:
+                if (msg.a.$ === "Ok") {
+                  return _Utils_Tuple2(
+                    model,
+                    $author$project$Page$ListPosts$fetchPosts
+                  );
+                } else {
+                  var error = msg.a.a;
+                  return _Utils_Tuple2(
+                    _Utils_update(model, {
+                      deleteError: $elm$core$Maybe$Just(
+                        $author$project$Error$buildErrorMessage(error)
+                      ),
+                    }),
+                    $elm$core$Platform$Cmd$none
+                  );
+                }
             }
           });
           var $author$project$Main$update = F2(function (msg, model) {
@@ -7750,6 +7803,9 @@ type alias Process =
               ])
             );
           };
+          var $author$project$Page$ListPosts$DeletePost = function (a) {
+            return { $: "DeletePost", a: a };
+          };
           var $elm$html$Html$a = _VirtualDom_node("a");
           var $elm$html$Html$Attributes$href = function (url) {
             return A2(
@@ -7804,6 +7860,22 @@ type alias Process =
                         ),
                       ]),
                       _List_fromArray([$elm$html$Html$text("Edit")])
+                    ),
+                  ])
+                ),
+                A2(
+                  $elm$html$Html$td,
+                  _List_Nil,
+                  _List_fromArray([
+                    A2(
+                      $elm$html$Html$button,
+                      _List_fromArray([
+                        $elm$html$Html$Attributes$type_("button"),
+                        $elm$html$Html$Events$onClick(
+                          $author$project$Page$ListPosts$DeletePost(post.id)
+                        ),
+                      ]),
+                      _List_fromArray([$elm$html$Html$text("Delete")])
                     ),
                   ])
                 ),
