@@ -5510,6 +5510,12 @@ type alias Process =
           var $author$project$Main$ListPageMsg = function (a) {
             return { $: "ListPageMsg", a: a };
           };
+          var $author$project$Main$NewPage = function (a) {
+            return { $: "NewPage", a: a };
+          };
+          var $author$project$Main$NewPageMsg = function (a) {
+            return { $: "NewPageMsg", a: a };
+          };
           var $elm$core$Platform$Cmd$batch = _Platform_batch;
           var $author$project$Page$EditPost$PostReceived = function (a) {
             return { $: "PostReceived", a: a };
@@ -6697,10 +6703,19 @@ type alias Process =
             $author$project$Page$ListPosts$initialModel,
             $author$project$Page$ListPosts$fetchPosts
           );
-          var $elm$core$Platform$Cmd$map = _Platform_map;
+          var $author$project$Page$NewPost$initialModel = function (navKey) {
+            return { navKey: navKey };
+          };
           var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(
             _List_Nil
           );
+          var $author$project$Page$NewPost$init = function (navKey) {
+            return _Utils_Tuple2(
+              $author$project$Page$NewPost$initialModel(navKey),
+              $elm$core$Platform$Cmd$none
+            );
+          };
+          var $elm$core$Platform$Cmd$map = _Platform_map;
           var $author$project$Main$initCurrentPage = function (_v0) {
             var model = _v0.a;
             var existingCmds = _v0.b;
@@ -6724,7 +6739,7 @@ type alias Process =
                       pageCmds
                     )
                   );
-                default:
+                case "Post":
                   var postId = _v2.a;
                   var _v4 = A2(
                     $author$project$Page$EditPost$init,
@@ -6741,6 +6756,18 @@ type alias Process =
                       pageCmd
                     )
                   );
+                default:
+                  var _v5 = $author$project$Page$NewPost$init(model.navKey);
+                  var pageModel = _v5.a;
+                  var pageCmd = _v5.b;
+                  return _Utils_Tuple2(
+                    $author$project$Main$NewPage(pageModel),
+                    A2(
+                      $elm$core$Platform$Cmd$map,
+                      $author$project$Main$NewPageMsg,
+                      pageCmd
+                    )
+                  );
               }
             })();
             var currentPage = _v1.a;
@@ -6753,6 +6780,7 @@ type alias Process =
             );
           };
           var $author$project$Route$NotFound = { $: "NotFound" };
+          var $author$project$Route$NewPost = { $: "NewPost" };
           var $author$project$Route$Post = function (a) {
             return { $: "Post", a: a };
           };
@@ -6959,6 +6987,15 @@ type alias Process =
                   $elm$url$Url$Parser$slash,
                   $elm$url$Url$Parser$s("posts"),
                   $author$project$Post$idParser
+                )
+              ),
+              A2(
+                $elm$url$Url$Parser$map,
+                $author$project$Route$NewPost,
+                A2(
+                  $elm$url$Url$Parser$slash,
+                  $elm$url$Url$Parser$s("posts"),
+                  $elm$url$Url$Parser$s("new")
                 )
               ),
             ])
@@ -7198,9 +7235,11 @@ type alias Process =
                 return "/not-found";
               case "Posts":
                 return "/posts";
-              default:
+              case "Post":
                 var postId = route.a;
                 return "/posts/" + $author$project$Post$idToString(postId);
+              default:
+                return "/posts/new";
             }
           };
           var $author$project$Route$pushUrl = F2(function (route, navKey) {
@@ -7490,7 +7529,7 @@ type alias Process =
                       $elm$core$Platform$Cmd$none
                     )
                   );
-                default:
+                case "EditPageMsg":
                   if (_v0.b.$ === "EditPage") {
                     var subMsg = _v0.a.a;
                     var pageModel = _v0.b.a;
@@ -7514,6 +7553,8 @@ type alias Process =
                   } else {
                     break _v0$4;
                   }
+                default:
+                  break _v0$4;
               }
             }
             return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -7784,6 +7825,37 @@ type alias Process =
             );
           };
           var $author$project$Page$ListPosts$FetchPosts = { $: "FetchPosts" };
+          var $elm$html$Html$a = _VirtualDom_node("a");
+          var $elm$html$Html$Attributes$href = function (url) {
+            return A2(
+              $elm$html$Html$Attributes$stringProperty,
+              "href",
+              _VirtualDom_noJavaScriptUri(url)
+            );
+          };
+          var $author$project$Page$ListPosts$viewDeleteError = function (
+            maybeString
+          ) {
+            if (maybeString.$ === "Just") {
+              var string = maybeString.a;
+              return A2(
+                $elm$html$Html$div,
+                _List_Nil,
+                _List_fromArray([
+                  A2(
+                    $elm$html$Html$h3,
+                    _List_Nil,
+                    _List_fromArray([
+                      $elm$html$Html$text("Couldn't delete post at this time."),
+                    ])
+                  ),
+                  $elm$html$Html$text("Error: " + string),
+                ])
+              );
+            } else {
+              return $elm$html$Html$text("");
+            }
+          };
           var $elm$html$Html$table = _VirtualDom_node("table");
           var $author$project$Page$ListPosts$viewFetchError = function (
             string
@@ -7805,14 +7877,6 @@ type alias Process =
           };
           var $author$project$Page$ListPosts$DeletePost = function (a) {
             return { $: "DeletePost", a: a };
-          };
-          var $elm$html$Html$a = _VirtualDom_node("a");
-          var $elm$html$Html$Attributes$href = function (url) {
-            return A2(
-              $elm$html$Html$Attributes$stringProperty,
-              "href",
-              _VirtualDom_noJavaScriptUri(url)
-            );
           };
           var $elm$html$Html$td = _VirtualDom_node("td");
           var $elm$html$Html$tr = _VirtualDom_node("tr");
@@ -7962,7 +8026,60 @@ type alias Process =
                   ]),
                   _List_fromArray([$elm$html$Html$text("Refresh posts")])
                 ),
+                A2($elm$html$Html$br, _List_Nil, _List_Nil),
+                A2($elm$html$Html$br, _List_Nil, _List_Nil),
+                A2(
+                  $elm$html$Html$a,
+                  _List_fromArray([
+                    $elm$html$Html$Attributes$href("/posts/new"),
+                  ]),
+                  _List_fromArray([$elm$html$Html$text("Create new post")])
+                ),
                 $author$project$Page$ListPosts$viewPosts(model.posts),
+                $author$project$Page$ListPosts$viewDeleteError(
+                  model.deleteError
+                ),
+              ])
+            );
+          };
+          var $author$project$Page$NewPost$StoreTitle = function (a) {
+            return { $: "StoreTitle", a: a };
+          };
+          var $author$project$Page$NewPost$newPostForm = A2(
+            $elm$html$Html$form,
+            _List_Nil,
+            _List_fromArray([
+              A2(
+                $elm$html$Html$div,
+                _List_Nil,
+                _List_fromArray([
+                  $elm$html$Html$text("Title"),
+                  A2($elm$html$Html$br, _List_Nil, _List_Nil),
+                  A2(
+                    $elm$html$Html$input,
+                    _List_fromArray([
+                      $elm$html$Html$Attributes$type_("text"),
+                      $elm$html$Html$Events$onInput(
+                        $author$project$Page$NewPost$StoreTitle
+                      ),
+                    ]),
+                    _List_Nil
+                  ),
+                ])
+              ),
+            ])
+          );
+          var $author$project$Page$NewPost$view = function (model) {
+            return A2(
+              $elm$html$Html$div,
+              _List_Nil,
+              _List_fromArray([
+                A2(
+                  $elm$html$Html$h3,
+                  _List_Nil,
+                  _List_fromArray([$elm$html$Html$text("Create New Post")])
+                ),
+                $author$project$Page$NewPost$newPostForm,
               ])
             );
           };
@@ -7978,12 +8095,19 @@ type alias Process =
                   $author$project$Main$ListPageMsg,
                   $author$project$Page$ListPosts$view(pageModel)
                 );
-              default:
+              case "EditPage":
                 var pageModel = _v0.a;
                 return A2(
                   $elm$html$Html$map,
                   $author$project$Main$EditPageMsg,
                   $author$project$Page$EditPost$view(pageModel)
+                );
+              default:
+                var pageModel = _v0.a;
+                return A2(
+                  $elm$html$Html$map,
+                  $author$project$Main$NewPageMsg,
+                  $author$project$Page$NewPost$view(pageModel)
                 );
             }
           };

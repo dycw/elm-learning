@@ -84,9 +84,12 @@ deletePost postId =
 view : Model -> Html Msg
 view model =
     div []
-        [ button [ onClick FetchPosts ]
-            [ text "Refresh posts" ]
+        [ button [ onClick FetchPosts ] [ text "Refresh posts" ]
+        , br [] []
+        , br [] []
+        , a [ href "/posts/new" ] [ text "Create new post" ]
         , viewPosts model.posts
+        , viewDeleteError model.deleteError
         ]
 
 
@@ -136,3 +139,13 @@ viewFetchError string =
         [ h3 [] [ text "Couldn't fetch posts at this time." ]
         , text ("Error: " ++ string)
         ]
+
+
+viewDeleteError : Maybe String -> Html Msg
+viewDeleteError maybeString =
+    case maybeString of
+        Just string ->
+            div [] [ h3 [] [ text "Couldn't delete post at this time." ], text ("Error: " ++ string) ]
+
+        Nothing ->
+            text ""

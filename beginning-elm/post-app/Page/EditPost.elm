@@ -1,7 +1,6 @@
 module Page.EditPost exposing (Model, Msg, init, update, view)
 
 import Browser.Navigation as Nav
-import Css.Global exposing (html)
 import Error exposing (buildErrorMessage)
 import Html exposing (..)
 import Html.Attributes exposing (..)
