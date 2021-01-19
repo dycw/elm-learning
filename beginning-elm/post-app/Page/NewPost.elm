@@ -1,4 +1,4 @@
-module Page.NewPost exposing (Model, Msg, init, view)
+module Page.NewPost exposing (Model, Msg, init, update, view)
 
 import Browser.Navigation as Nav
 import Error exposing (buildErrorMessage)
@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Post exposing (Post, emptyPost, postDecoder, postEncoder)
+import Route
 
 
 
@@ -51,7 +52,11 @@ initialModel navKey =
 
 view : Model -> Html Msg
 view model =
-    div [] [ h3 [] [ text "Create New Post" ], newPostForm ]
+    div []
+        [ h3 [] [ text "Create New Post" ]
+        , newPostForm
+        , viewError model.createError
+        ]
 
 
 newPostForm : Html Msg
@@ -81,42 +86,60 @@ newPostForm =
         ]
 
 
+viewError : Maybe String -> Html Msg
+viewError maybeError =
+    case maybeError of
+        Just error ->
+            div []
+                [ h3 [] [ text "Couldn't create a post at this time." ]
+                , text ("Error" ++ error)
+                ]
+
+        Nothing ->
+            text ""
+
+
 
 -- update
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    --    let
-    --         oldPost = model.post
-    --     in
     case msg of
         StoreTitle title ->
             let
                 oldPost =
                     model.post
             in
-            ( { model | post = { oldPost | title = title } }, Cmd.none )
+            ( { model | post = { oldPost | title = title } }
+            , Cmd.none
+            )
 
         StoreAuthorName name ->
             let
                 oldPost =
                     model.post
             in
-            ( { model | post = { oldPost | authorName = name } }, Cmd.none )
+            ( { model | post = { oldPost | authorName = name } }
+            , Cmd.none
+            )
 
         StoreAuthorUrl url ->
             let
                 oldPost =
                     model.post
             in
-            ( { model | post = { oldPost | authorUrl = url } }, Cmd.none )
+            ( { model | post = { oldPost | authorUrl = url } }
+            , Cmd.none
+            )
 
         CreatePost ->
             ( model, createPost model.post )
 
         PostCreated (Ok post) ->
-            ( { model | post = post, createError = Nothing }, Cmd.none )
+            ( { model | post = post, createError = Nothing }
+            , Route.pushUrl Route.Posts model.navKey
+            )
 
         PostCreated (Err error) ->
             ( { model | createError = Just (buildErrorMessage error) }

@@ -151,6 +151,15 @@ update msg model =
             , Cmd.map EditPageMsg updatedCmd
             )
 
+        ( NewPageMsg subMsg, NewPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    NewPost.update subMsg pageModel
+            in
+            ( { model | page = NewPage updatedPageModel }
+            , Cmd.map NewPageMsg updatedCmd
+            )
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
