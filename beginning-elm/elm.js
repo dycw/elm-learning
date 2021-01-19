@@ -5232,7 +5232,94 @@ type alias Process =
     );
   });
   var $elm$browser$Browser$application = _Browser_application;
+  var $elm$http$Http$BadBody = function (a) {
+    return { $: "BadBody", a: a };
+  };
+  var $krisajenkins$remotedata$RemoteData$Failure = function (a) {
+    return { $: "Failure", a: a };
+  };
   var $author$project$Main$NotFoundPage = { $: "NotFoundPage" };
+  var $krisajenkins$remotedata$RemoteData$Loading = { $: "Loading" };
+  var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+  var $elm$json$Json$Decode$list = _Json_decodeList;
+  var $author$project$Post$Post = F4(function (
+    id,
+    title,
+    authorName,
+    authorUrl
+  ) {
+    return {
+      authorName: authorName,
+      authorUrl: authorUrl,
+      id: id,
+      title: title,
+    };
+  });
+  var $author$project$Post$PostId = function (a) {
+    return { $: "PostId", a: a };
+  };
+  var $elm$json$Json$Decode$int = _Json_decodeInt;
+  var $author$project$Post$idDecoder = A2(
+    $elm$json$Json$Decode$map,
+    $author$project$Post$PostId,
+    $elm$json$Json$Decode$int
+  );
+  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2(
+    $elm$core$Basics$apR
+  );
+  var $elm$json$Json$Decode$field = _Json_decodeField;
+  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
+    function (key, valDecoder, decoder) {
+      return A2(
+        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+        A2($elm$json$Json$Decode$field, key, valDecoder),
+        decoder
+      );
+    }
+  );
+  var $elm$json$Json$Decode$string = _Json_decodeString;
+  var $author$project$Post$postDecoder = A3(
+    $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+    "authorUrl",
+    $elm$json$Json$Decode$string,
+    A3(
+      $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+      "authorName",
+      $elm$json$Json$Decode$string,
+      A3(
+        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+        "title",
+        $elm$json$Json$Decode$string,
+        A3(
+          $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+          "id",
+          $author$project$Post$idDecoder,
+          $elm$json$Json$Decode$succeed($author$project$Post$Post)
+        )
+      )
+    )
+  );
+  var $author$project$Post$postsDecoder = $elm$json$Json$Decode$list(
+    $author$project$Post$postDecoder
+  );
+  var $krisajenkins$remotedata$RemoteData$Success = function (a) {
+    return { $: "Success", a: a };
+  };
+  var $krisajenkins$remotedata$RemoteData$succeed = $krisajenkins$remotedata$RemoteData$Success;
+  var $author$project$Main$decodeStoredPosts = function (postsJson) {
+    var _v0 = A2(
+      $elm$json$Json$Decode$decodeString,
+      $author$project$Post$postsDecoder,
+      postsJson
+    );
+    if (_v0.$ === "Ok") {
+      var posts = _v0.a;
+      return $krisajenkins$remotedata$RemoteData$succeed(posts);
+    } else {
+      return $krisajenkins$remotedata$RemoteData$Loading;
+    }
+  };
+  var $elm$json$Json$Decode$decodeValue = _Json_run;
   var $author$project$Main$EditPage = function (a) {
     return { $: "EditPage", a: a };
   };
@@ -5258,7 +5345,6 @@ type alias Process =
   var $elm$core$Basics$composeR = F3(function (f, g, x) {
     return g(f(x));
   });
-  var $elm$json$Json$Decode$decodeString = _Json_runOnString;
   var $elm$http$Http$BadStatus_ = F2(function (a, b) {
     return { $: "BadStatus_", a: a, b: b };
   });
@@ -6019,9 +6105,6 @@ type alias Process =
       return $elm$core$Result$Err(f(e));
     }
   });
-  var $elm$http$Http$BadBody = function (a) {
-    return { $: "BadBody", a: a };
-  };
   var $elm$http$Http$BadStatus = function (a) {
     return { $: "BadStatus", a: a };
   };
@@ -6066,12 +6149,6 @@ type alias Process =
       })
     );
   });
-  var $krisajenkins$remotedata$RemoteData$Failure = function (a) {
-    return { $: "Failure", a: a };
-  };
-  var $krisajenkins$remotedata$RemoteData$Success = function (a) {
-    return { $: "Success", a: a };
-  };
   var $krisajenkins$remotedata$RemoteData$fromResult = function (result) {
     if (result.$ === "Err") {
       var e = result.a;
@@ -6280,63 +6357,6 @@ type alias Process =
     var id = _v0.a;
     return $elm$core$String$fromInt(id);
   };
-  var $author$project$Post$Post = F4(function (
-    id,
-    title,
-    authorName,
-    authorUrl
-  ) {
-    return {
-      authorName: authorName,
-      authorUrl: authorUrl,
-      id: id,
-      title: title,
-    };
-  });
-  var $author$project$Post$PostId = function (a) {
-    return { $: "PostId", a: a };
-  };
-  var $elm$json$Json$Decode$int = _Json_decodeInt;
-  var $author$project$Post$idDecoder = A2(
-    $elm$json$Json$Decode$map,
-    $author$project$Post$PostId,
-    $elm$json$Json$Decode$int
-  );
-  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2(
-    $elm$core$Basics$apR
-  );
-  var $elm$json$Json$Decode$field = _Json_decodeField;
-  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
-    function (key, valDecoder, decoder) {
-      return A2(
-        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
-        A2($elm$json$Json$Decode$field, key, valDecoder),
-        decoder
-      );
-    }
-  );
-  var $elm$json$Json$Decode$string = _Json_decodeString;
-  var $author$project$Post$postDecoder = A3(
-    $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-    "authorUrl",
-    $elm$json$Json$Decode$string,
-    A3(
-      $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-      "authorName",
-      $elm$json$Json$Decode$string,
-      A3(
-        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-        "title",
-        $elm$json$Json$Decode$string,
-        A3(
-          $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-          "id",
-          $author$project$Post$idDecoder,
-          $elm$json$Json$Decode$succeed($author$project$Post$Post)
-        )
-      )
-    )
-  );
   var $author$project$Page$EditPost$fetchPost = function (postId) {
     return $elm$http$Http$get({
       expect: A2(
@@ -6353,7 +6373,6 @@ type alias Process =
         $author$project$Post$idToString(postId),
     });
   };
-  var $krisajenkins$remotedata$RemoteData$Loading = { $: "Loading" };
   var $author$project$Page$EditPost$initialModel = function (navKey) {
     return {
       navKey: navKey,
@@ -6370,10 +6389,6 @@ type alias Process =
   var $author$project$Page$ListPosts$PostsReceived = function (a) {
     return { $: "PostsReceived", a: a };
   };
-  var $elm$json$Json$Decode$list = _Json_decodeList;
-  var $author$project$Post$postsDecoder = $elm$json$Json$Decode$list(
-    $author$project$Post$postDecoder
-  );
   var $author$project$Page$ListPosts$fetchPosts = $elm$http$Http$get({
     expect: A2(
       $elm$http$Http$expectJson,
@@ -6386,14 +6401,32 @@ type alias Process =
     ),
     url: "http://localhost:5019/posts/",
   });
-  var $author$project$Page$ListPosts$initialModel = {
-    deleteError: $elm$core$Maybe$Nothing,
-    posts: $krisajenkins$remotedata$RemoteData$Loading,
+  var $krisajenkins$remotedata$RemoteData$isFailure = function (data) {
+    if (data.$ === "Failure") {
+      var x = data.a;
+      return true;
+    } else {
+      return false;
+    }
   };
-  var $author$project$Page$ListPosts$init = _Utils_Tuple2(
-    $author$project$Page$ListPosts$initialModel,
-    $author$project$Page$ListPosts$fetchPosts
-  );
+  var $krisajenkins$remotedata$RemoteData$isSuccess = function (data) {
+    if (data.$ === "Success") {
+      var x = data.a;
+      return true;
+    } else {
+      return false;
+    }
+  };
+  var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+  var $author$project$Page$ListPosts$init = function (posts) {
+    var model = { deleteError: $elm$core$Maybe$Nothing, posts: posts };
+    var cmd =
+      $krisajenkins$remotedata$RemoteData$isSuccess(posts) ||
+      $krisajenkins$remotedata$RemoteData$isFailure(posts)
+        ? $elm$core$Platform$Cmd$none
+        : $author$project$Page$ListPosts$fetchPosts;
+    return _Utils_Tuple2(model, cmd);
+  };
   var $elm$core$Basics$negate = function (n) {
     return -n;
   };
@@ -6411,7 +6444,6 @@ type alias Process =
       post: $author$project$Post$emptyPost,
     };
   };
-  var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
   var $author$project$Page$NewPost$init = function (navKey) {
     return _Utils_Tuple2(
       $author$project$Page$NewPost$initialModel(navKey),
@@ -6419,7 +6451,7 @@ type alias Process =
     );
   };
   var $elm$core$Platform$Cmd$map = _Platform_map;
-  var $author$project$Main$initCurrentPage = function (_v0) {
+  var $author$project$Main$initCurrentPage = F2(function (posts, _v0) {
     var model = _v0.a;
     var existingCmds = _v0.b;
     var _v1 = (function () {
@@ -6431,7 +6463,7 @@ type alias Process =
             $elm$core$Platform$Cmd$none
           );
         case "Posts":
-          var _v3 = $author$project$Page$ListPosts$init;
+          var _v3 = $author$project$Page$ListPosts$init(posts);
           var pageModel = _v3.a;
           var pageCmds = _v3.b;
           return _Utils_Tuple2(
@@ -6481,7 +6513,7 @@ type alias Process =
         _List_fromArray([existingCmds, mappedPageCmds])
       )
     );
-  };
+  });
   var $author$project$Route$NotFound = { $: "NotFound" };
   var $author$project$Route$NewPost = { $: "NewPost" };
   var $author$project$Route$Post = function (a) {
@@ -6817,12 +6849,29 @@ type alias Process =
     }
   };
   var $author$project$Main$init = F3(function (flags, url, navKey) {
+    var posts = (function () {
+      var _v0 = A2(
+        $elm$json$Json$Decode$decodeValue,
+        $elm$json$Json$Decode$string,
+        flags
+      );
+      if (_v0.$ === "Ok") {
+        var postsJson = _v0.a;
+        return $author$project$Main$decodeStoredPosts(postsJson);
+      } else {
+        return $krisajenkins$remotedata$RemoteData$Failure(
+          $elm$http$Http$BadBody("Flags must be either string or null")
+        );
+      }
+    })();
     var model = {
       navKey: navKey,
       page: $author$project$Main$NotFoundPage,
       route: $author$project$Route$parseUrl(url),
     };
-    return $author$project$Main$initCurrentPage(
+    return A2(
+      $author$project$Main$initCurrentPage,
+      posts,
       _Utils_Tuple2(model, $elm$core$Platform$Cmd$none)
     );
   });
@@ -6994,7 +7043,6 @@ type alias Process =
       return $elm$core$Platform$Cmd$none;
     }
   };
-  var $krisajenkins$remotedata$RemoteData$succeed = $krisajenkins$remotedata$RemoteData$Success;
   var $author$project$Page$EditPost$update = F2(function (msg, model) {
     switch (msg.$) {
       case "PostReceived":
@@ -7308,7 +7356,9 @@ type alias Process =
           }
         case "UrlChanged":
           var url = _v0.a.a;
-          return $author$project$Main$initCurrentPage(
+          return A2(
+            $author$project$Main$initCurrentPage,
+            $krisajenkins$remotedata$RemoteData$Loading,
             _Utils_Tuple2(
               _Utils_update(model, {
                 route: $author$project$Route$parseUrl(url),
@@ -7368,6 +7418,7 @@ type alias Process =
     }
     return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
   });
+  var $elm$json$Json$Decode$value = _Json_decodeValue;
   var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
   var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
   var $elm$html$Html$h3 = _VirtualDom_node("h3");
@@ -7991,10 +8042,6 @@ type alias Process =
     view: $author$project$Main$view,
   });
   _Platform_export({
-    Main: {
-      init: $author$project$Main$main(
-        $elm$json$Json$Decode$succeed(_Utils_Tuple0)
-      )(0),
-    },
+    Main: { init: $author$project$Main$main($elm$json$Json$Decode$value)(0) },
   });
 })(this);
