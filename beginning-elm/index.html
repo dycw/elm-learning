@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html>
   <body>
-    <div id="elm-code-is-loaded-here"></div>
-
     <script src="elm.js"></script>
     <script>
-      var app = Elm.PortExamples.init({
-        node: document.getElementById("elm-code-is-loaded-here"),
+      var app = Elm.Main.init();
+      app.ports.storePosts.subscribe(function (posts) {
+        console.log("Posts: ", JSON.stringify(posts));
       });
-
-      app.ports.sendData.subscribe(function (data) {
-        console.log("Data from Elm: ", JSON.stringify(data));
-        app.ports.receiveData.send("Hello Elm!");
+      app.ports.storePosts.subscribe(function (posts) {
+        if (posts.length > 0) {
+          var postsJson = JSON.stringify(posts);
+          localStorage.setItem("post-app-save", postsJson);
+          console.log("Saved state: ", postsJson);
+        }
       });
     </script>
   </body>

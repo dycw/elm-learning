@@ -1,8 +1,9 @@
-module Post exposing (Post, PostId, emptyPost, idParser, idToString, postDecoder, postEncoder, postsDecoder)
+module Post exposing (Post, PostId, emptyPost, idParser, idToString, postDecoder, postEncoder, postsDecoder, savePosts)
 
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode as Encode
+import Ports exposing (storePosts)
 import Url.Parser exposing (Parser, custom)
 
 
@@ -74,3 +75,10 @@ emptyPost =
 emptyPostId : PostId
 emptyPostId =
     PostId -1
+
+
+savePosts : List Post -> Cmd msg
+savePosts posts =
+    Encode.list postEncoder posts
+        |> Encode.encode 0
+        |> Ports.storePosts
