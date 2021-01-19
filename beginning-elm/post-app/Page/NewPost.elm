@@ -1,15 +1,12 @@
 module Page.NewPost exposing (Model, Msg, init, view)
 
--- import Post exposing (Post, PostId, emptyPost, newPostEncoder, postDecoder)
-
 import Browser.Navigation as Nav
 import Error exposing (buildErrorMessage)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Post exposing (Post, PostId, postDecoder, postEncoder)
-import Route
+import Post exposing (Post, emptyPost, postDecoder, postEncoder)
 
 
 
@@ -17,7 +14,10 @@ import Route
 
 
 type alias Model =
-    { navKey : Nav.Key }
+    { navKey : Nav.Key
+    , post : Post
+    , createError : Maybe String
+    }
 
 
 type Msg
@@ -39,7 +39,10 @@ init navKey =
 
 initialModel : Nav.Key -> Model
 initialModel navKey =
-    { navKey = navKey }
+    { navKey = navKey
+    , post = emptyPost
+    , createError = Nothing
+    }
 
 
 
@@ -80,6 +83,45 @@ newPostForm =
 
 
 -- update
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    --    let
+    --         oldPost = model.post
+    --     in
+    case msg of
+        StoreTitle title ->
+            let
+                oldPost =
+                    model.post
+            in
+            ( { model | post = { oldPost | title = title } }, Cmd.none )
+
+        StoreAuthorName name ->
+            let
+                oldPost =
+                    model.post
+            in
+            ( { model | post = { oldPost | authorName = name } }, Cmd.none )
+
+        StoreAuthorUrl url ->
+            let
+                oldPost =
+                    model.post
+            in
+            ( { model | post = { oldPost | authorUrl = url } }, Cmd.none )
+
+        CreatePost ->
+            ( model, createPost model.post )
+
+        PostCreated (Ok post) ->
+            ( { model | post = post, createError = Nothing }, Cmd.none )
+
+        PostCreated (Err error) ->
+            ( { model | createError = Just (buildErrorMessage error) }
+            , Cmd.none
+            )
 
 
 createPost : Post -> Cmd Msg

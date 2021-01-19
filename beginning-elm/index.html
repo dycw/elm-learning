@@ -6703,8 +6703,24 @@ type alias Process =
             $author$project$Page$ListPosts$initialModel,
             $author$project$Page$ListPosts$fetchPosts
           );
+          var $elm$core$Basics$negate = function (n) {
+            return -n;
+          };
+          var $author$project$Post$emptyPostId = $author$project$Post$PostId(
+            -1
+          );
+          var $author$project$Post$emptyPost = {
+            authorName: "",
+            authorUrl: "",
+            id: $author$project$Post$emptyPostId,
+            title: "",
+          };
           var $author$project$Page$NewPost$initialModel = function (navKey) {
-            return { navKey: navKey };
+            return {
+              createError: $elm$core$Maybe$Nothing,
+              navKey: navKey,
+              post: $author$project$Post$emptyPost,
+            };
           };
           var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(
             _List_Nil

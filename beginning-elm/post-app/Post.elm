@@ -1,4 +1,4 @@
-module Post exposing (Post, PostId, idParser, idToString, postDecoder, postEncoder, postsDecoder)
+module Post exposing (Post, PostId, emptyPost, idParser, idToString, postDecoder, postEncoder, postsDecoder)
 
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
@@ -60,3 +60,17 @@ idParser =
 idToString : PostId -> String
 idToString (PostId id) =
     String.fromInt id
+
+
+emptyPost : Post
+emptyPost =
+    { id = emptyPostId
+    , title = ""
+    , authorName = ""
+    , authorUrl = ""
+    }
+
+
+emptyPostId : PostId
+emptyPostId =
+    PostId -1
