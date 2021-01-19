@@ -8042,6 +8042,13 @@ type alias Process =
               ])
             );
           };
+          var $author$project$Page$NewPost$CreatePost = { $: "CreatePost" };
+          var $author$project$Page$NewPost$StoreAuthorName = function (a) {
+            return { $: "StoreAuthorName", a: a };
+          };
+          var $author$project$Page$NewPost$StoreAuthorUrl = function (a) {
+            return { $: "StoreAuthorUrl", a: a };
+          };
           var $author$project$Page$NewPost$StoreTitle = function (a) {
             return { $: "StoreTitle", a: a };
           };
@@ -8064,6 +8071,61 @@ type alias Process =
                       ),
                     ]),
                     _List_Nil
+                  ),
+                ])
+              ),
+              A2($elm$html$Html$br, _List_Nil, _List_Nil),
+              A2(
+                $elm$html$Html$div,
+                _List_Nil,
+                _List_fromArray([
+                  $elm$html$Html$text("Author Name"),
+                  A2($elm$html$Html$br, _List_Nil, _List_Nil),
+                  A2(
+                    $elm$html$Html$input,
+                    _List_fromArray([
+                      $elm$html$Html$Attributes$type_("text"),
+                      $elm$html$Html$Events$onInput(
+                        $author$project$Page$NewPost$StoreAuthorName
+                      ),
+                    ]),
+                    _List_Nil
+                  ),
+                ])
+              ),
+              A2($elm$html$Html$br, _List_Nil, _List_Nil),
+              A2(
+                $elm$html$Html$div,
+                _List_Nil,
+                _List_fromArray([
+                  $elm$html$Html$text("Author URL"),
+                  A2($elm$html$Html$br, _List_Nil, _List_Nil),
+                  A2(
+                    $elm$html$Html$input,
+                    _List_fromArray([
+                      $elm$html$Html$Attributes$type_("text"),
+                      $elm$html$Html$Events$onInput(
+                        $author$project$Page$NewPost$StoreAuthorUrl
+                      ),
+                    ]),
+                    _List_Nil
+                  ),
+                ])
+              ),
+              A2($elm$html$Html$br, _List_Nil, _List_Nil),
+              A2(
+                $elm$html$Html$div,
+                _List_Nil,
+                _List_fromArray([
+                  A2(
+                    $elm$html$Html$button,
+                    _List_fromArray([
+                      $elm$html$Html$Attributes$type_("button"),
+                      $elm$html$Html$Events$onClick(
+                        $author$project$Page$NewPost$CreatePost
+                      ),
+                    ]),
+                    _List_fromArray([$elm$html$Html$text("Submit")])
                   ),
                 ])
               ),
