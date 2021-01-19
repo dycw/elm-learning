@@ -5010,42 +5010,186 @@ type alias Process =
     );
   });
   var $elm$browser$Browser$element = _Browser_element;
+  var $author$project$PortExamples$Author = F2(function (name, url) {
+    return { name: name, url: url };
+  });
+  var $author$project$PortExamples$Comment = F3(function (id, body, postId) {
+    return { body: body, id: id, postId: postId };
+  });
+  var $author$project$PortExamples$Post = F3(function (id, title, author) {
+    return { author: author, id: id, title: title };
+  });
+  var $author$project$PortExamples$complexData = {
+    comments: _List_fromArray([
+      A3($author$project$PortExamples$Comment, 1, "some comment", 1),
+    ]),
+    posts: _List_fromArray([
+      A3(
+        $author$project$PortExamples$Post,
+        1,
+        "json-server",
+        A2(
+          $author$project$PortExamples$Author,
+          "typicode",
+          "https://github.com/typicode"
+        )
+      ),
+      A3(
+        $author$project$PortExamples$Post,
+        2,
+        "http-server",
+        A2(
+          $author$project$PortExamples$Author,
+          "indexzero",
+          "https://github.com/indexzero"
+        )
+      ),
+    ]),
+    profile: { name: "typicode" },
+  };
   var $elm$core$Platform$Cmd$batch = _Platform_batch;
   var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
   var $author$project$PortExamples$init = function (_v0) {
-    return _Utils_Tuple2("", $elm$core$Platform$Cmd$none);
+    return _Utils_Tuple2(
+      {
+        dataFromJS: "",
+        dataToJS: $author$project$PortExamples$complexData,
+        jsonError: $elm$core$Maybe$Nothing,
+      },
+      $elm$core$Platform$Cmd$none
+    );
   };
   var $author$project$PortExamples$ReceivedDataFromJS = function (a) {
     return { $: "ReceivedDataFromJS", a: a };
   };
-  var $elm$json$Json$Decode$string = _Json_decodeString;
+  var $elm$json$Json$Decode$value = _Json_decodeValue;
   var $author$project$PortExamples$receiveData = _Platform_incomingPort(
     "receiveData",
-    $elm$json$Json$Decode$string
+    $elm$json$Json$Decode$value
   );
   var $author$project$PortExamples$subscriptions = function (_v0) {
     return $author$project$PortExamples$receiveData(
       $author$project$PortExamples$ReceivedDataFromJS
     );
   };
+  var $elm$json$Json$Decode$decodeValue = _Json_run;
+  var $elm$json$Json$Encode$int = _Json_wrap;
+  var $elm$json$Json$Encode$list = F2(function (func, entries) {
+    return _Json_wrap(
+      A3(
+        $elm$core$List$foldl,
+        _Json_addEntry(func),
+        _Json_emptyArray(_Utils_Tuple0),
+        entries
+      )
+    );
+  });
+  var $elm$json$Json$Encode$object = function (pairs) {
+    return _Json_wrap(
+      A3(
+        $elm$core$List$foldl,
+        F2(function (_v0, obj) {
+          var k = _v0.a;
+          var v = _v0.b;
+          return A3(_Json_addField, k, v, obj);
+        }),
+        _Json_emptyObject(_Utils_Tuple0),
+        pairs
+      )
+    );
+  };
   var $elm$json$Json$Encode$string = _Json_wrap;
   var $author$project$PortExamples$sendData = _Platform_outgoingPort(
     "sendData",
-    $elm$json$Json$Encode$string
+    function ($) {
+      return $elm$json$Json$Encode$object(
+        _List_fromArray([
+          _Utils_Tuple2(
+            "comments",
+            $elm$json$Json$Encode$list(function ($) {
+              return $elm$json$Json$Encode$object(
+                _List_fromArray([
+                  _Utils_Tuple2("body", $elm$json$Json$Encode$string($.body)),
+                  _Utils_Tuple2("id", $elm$json$Json$Encode$int($.id)),
+                  _Utils_Tuple2("postId", $elm$json$Json$Encode$int($.postId)),
+                ])
+              );
+            })($.comments)
+          ),
+          _Utils_Tuple2(
+            "posts",
+            $elm$json$Json$Encode$list(function ($) {
+              return $elm$json$Json$Encode$object(
+                _List_fromArray([
+                  _Utils_Tuple2(
+                    "author",
+                    (function ($) {
+                      return $elm$json$Json$Encode$object(
+                        _List_fromArray([
+                          _Utils_Tuple2(
+                            "name",
+                            $elm$json$Json$Encode$string($.name)
+                          ),
+                          _Utils_Tuple2(
+                            "url",
+                            $elm$json$Json$Encode$string($.url)
+                          ),
+                        ])
+                      );
+                    })($.author)
+                  ),
+                  _Utils_Tuple2("id", $elm$json$Json$Encode$int($.id)),
+                  _Utils_Tuple2("title", $elm$json$Json$Encode$string($.title)),
+                ])
+              );
+            })($.posts)
+          ),
+          _Utils_Tuple2(
+            "profile",
+            (function ($) {
+              return $elm$json$Json$Encode$object(
+                _List_fromArray([
+                  _Utils_Tuple2("name", $elm$json$Json$Encode$string($.name)),
+                ])
+              );
+            })($.profile)
+          ),
+        ])
+      );
+    }
   );
+  var $elm$json$Json$Decode$string = _Json_decodeString;
   var $author$project$PortExamples$update = F2(function (msg, model) {
     if (msg.$ === "SendDataToJS") {
       return _Utils_Tuple2(
         model,
-        $author$project$PortExamples$sendData("Hello JavaScript!")
+        $author$project$PortExamples$sendData(model.dataToJS)
       );
     } else {
-      var data = msg.a;
-      return _Utils_Tuple2(data, $elm$core$Platform$Cmd$none);
+      var value = msg.a;
+      var _v1 = A2(
+        $elm$json$Json$Decode$decodeValue,
+        $elm$json$Json$Decode$string,
+        value
+      );
+      if (_v1.$ === "Ok") {
+        var data = _v1.a;
+        return _Utils_Tuple2(
+          _Utils_update(model, { dataFromJS: data }),
+          $elm$core$Platform$Cmd$none
+        );
+      } else {
+        var error = _v1.a;
+        return _Utils_Tuple2(
+          _Utils_update(model, {
+            jsonError: $elm$core$Maybe$Just(error),
+          }),
+          $elm$core$Platform$Cmd$none
+        );
+      }
     }
   });
   var $author$project$PortExamples$SendDataToJS = { $: "SendDataToJS" };
-  var $elm$html$Html$br = _VirtualDom_node("br");
   var $elm$html$Html$button = _VirtualDom_node("button");
   var $elm$html$Html$div = _VirtualDom_node("div");
   var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5068,6 +5212,53 @@ type alias Process =
   };
   var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
   var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+  var $elm$html$Html$br = _VirtualDom_node("br");
+  var $author$project$PortExamples$viewDataFromJS = function (data) {
+    return A2(
+      $elm$html$Html$div,
+      _List_Nil,
+      _List_fromArray([
+        A2($elm$html$Html$br, _List_Nil, _List_Nil),
+        A2($elm$html$Html$br, _List_Nil, _List_Nil),
+        $elm$html$Html$text("Data received from Javascript: "),
+        $elm$html$Html$text(data),
+      ])
+    );
+  };
+  var $elm$html$Html$h3 = _VirtualDom_node("h3");
+  var $author$project$PortExamples$viewError = function (error) {
+    var errorMessage = (function () {
+      if (error.$ === "Failure") {
+        var message = error.a;
+        return message;
+      } else {
+        return "Error: Invalid JSON";
+      }
+    })();
+    return A2(
+      $elm$html$Html$div,
+      _List_Nil,
+      _List_fromArray([
+        A2(
+          $elm$html$Html$h3,
+          _List_Nil,
+          _List_fromArray([
+            $elm$html$Html$text("Couldn't retrieve data from JavaScript"),
+          ])
+        ),
+        $elm$html$Html$text("Error: " + errorMessage),
+      ])
+    );
+  };
+  var $author$project$PortExamples$viewDataFromJSOrError = function (model) {
+    var _v0 = model.jsonError;
+    if (_v0.$ === "Just") {
+      var error = _v0.a;
+      return $author$project$PortExamples$viewError(error);
+    } else {
+      return $author$project$PortExamples$viewDataFromJS(model.dataFromJS);
+    }
+  };
   var $author$project$PortExamples$view = function (model) {
     return A2(
       $elm$html$Html$div,
@@ -5082,9 +5273,7 @@ type alias Process =
           ]),
           _List_fromArray([$elm$html$Html$text("Send Data to JavaScript")])
         ),
-        A2($elm$html$Html$br, _List_Nil, _List_Nil),
-        A2($elm$html$Html$br, _List_Nil, _List_Nil),
-        $elm$html$Html$text("Data received from Javascript: " + model),
+        $author$project$PortExamples$viewDataFromJSOrError(model),
       ])
     );
   };
