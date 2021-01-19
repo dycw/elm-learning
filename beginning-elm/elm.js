@@ -5015,20 +5015,37 @@ type alias Process =
   var $author$project$PortExamples$init = function (_v0) {
     return _Utils_Tuple2("", $elm$core$Platform$Cmd$none);
   };
-  var $elm$core$Platform$Sub$batch = _Platform_batch;
-  var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+  var $author$project$PortExamples$ReceivedDataFromJS = function (a) {
+    return { $: "ReceivedDataFromJS", a: a };
+  };
+  var $elm$json$Json$Decode$string = _Json_decodeString;
+  var $author$project$PortExamples$receiveData = _Platform_incomingPort(
+    "receiveData",
+    $elm$json$Json$Decode$string
+  );
+  var $author$project$PortExamples$subscriptions = function (_v0) {
+    return $author$project$PortExamples$receiveData(
+      $author$project$PortExamples$ReceivedDataFromJS
+    );
+  };
   var $elm$json$Json$Encode$string = _Json_wrap;
   var $author$project$PortExamples$sendData = _Platform_outgoingPort(
     "sendData",
     $elm$json$Json$Encode$string
   );
   var $author$project$PortExamples$update = F2(function (msg, model) {
-    return _Utils_Tuple2(
-      model,
-      $author$project$PortExamples$sendData("Hello JavaScript!")
-    );
+    if (msg.$ === "SendDataToJS") {
+      return _Utils_Tuple2(
+        model,
+        $author$project$PortExamples$sendData("Hello JavaScript!")
+      );
+    } else {
+      var data = msg.a;
+      return _Utils_Tuple2(data, $elm$core$Platform$Cmd$none);
+    }
   });
   var $author$project$PortExamples$SendDataToJS = { $: "SendDataToJS" };
+  var $elm$html$Html$br = _VirtualDom_node("br");
   var $elm$html$Html$button = _VirtualDom_node("button");
   var $elm$html$Html$div = _VirtualDom_node("div");
   var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5051,7 +5068,7 @@ type alias Process =
   };
   var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
   var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-  var $author$project$PortExamples$view = function (_v0) {
+  var $author$project$PortExamples$view = function (model) {
     return A2(
       $elm$html$Html$div,
       _List_Nil,
@@ -5065,14 +5082,15 @@ type alias Process =
           ]),
           _List_fromArray([$elm$html$Html$text("Send Data to JavaScript")])
         ),
+        A2($elm$html$Html$br, _List_Nil, _List_Nil),
+        A2($elm$html$Html$br, _List_Nil, _List_Nil),
+        $elm$html$Html$text("Data received from Javascript: " + model),
       ])
     );
   };
   var $author$project$PortExamples$main = $elm$browser$Browser$element({
     init: $author$project$PortExamples$init,
-    subscriptions: function (_v0) {
-      return $elm$core$Platform$Sub$none;
-    },
+    subscriptions: $author$project$PortExamples$subscriptions,
     update: $author$project$PortExamples$update,
     view: $author$project$PortExamples$view,
   });
