@@ -1,7 +1,7 @@
 module EventListener exposing (Model)
 
 import Browser
-import Browser.Events exposing (onKeyPress)
+import Browser.Events exposing (onClick, onKeyPress)
 import Css exposing (Ch)
 import Html exposing (..)
 import Json.Decode as Decode
@@ -14,6 +14,7 @@ type alias Model =
 type Msg
     = CharacterKey Char
     | ControlKey String
+    | MouseClick
 
 
 init : () -> ( Model, Cmd Msg )
@@ -36,13 +37,22 @@ update msg model =
         CharacterKey 'd' ->
             ( model - 1, Cmd.none )
 
-        _ ->
+        CharacterKey _ ->
             ( model, Cmd.none )
+
+        ControlKey _ ->
+            ( model, Cmd.none )
+
+        MouseClick ->
+            ( model + 5, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    onKeyPress keyDecoder
+    Sub.batch
+        [ onKeyPress keyDecoder
+        , onClick (Decode.succeed MouseClick)
+        ]
 
 
 keyDecoder : Decode.Decoder Msg
