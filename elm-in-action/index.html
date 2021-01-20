@@ -4580,16 +4580,19 @@ type alias Process =
             thumb
           ) {
             var url = thumb.url;
-            var attrs = A2(
-              $elm$core$List$cons,
-              $elm$html$Html$Attributes$src(
-                _Utils_ap($author$project$PhotoGroove$urlPrefix, url)
+            var tail = _Utils_eq(selectedUrl, url)
+              ? _List_fromArray([$elm$html$Html$Attributes$class("selected")])
+              : _List_Nil;
+            var head = _Utils_ap($author$project$PhotoGroove$urlPrefix, url);
+            return A2(
+              $elm$html$Html$img,
+              A2(
+                $elm$core$List$cons,
+                $elm$html$Html$Attributes$src(head),
+                tail
               ),
-              _Utils_eq(selectedUrl, url)
-                ? _List_fromArray([$elm$html$Html$Attributes$class("selected")])
-                : _List_Nil
+              _List_Nil
             );
-            return A2($elm$html$Html$img, attrs, _List_Nil);
           });
           var $author$project$PhotoGroove$view = function (model) {
             return A2(

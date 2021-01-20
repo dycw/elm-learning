@@ -56,16 +56,17 @@ viewThumbnail selectedUrl thumb =
         url =
             thumb.url
 
-        attrs =
-            src (urlPrefix ++ url)
-                :: (if selectedUrl == url then
-                        [ class "selected" ]
+        head =
+            urlPrefix ++ url
 
-                    else
-                        []
-                   )
+        tail =
+            if selectedUrl == url then
+                [ class "selected" ]
+
+            else
+                []
     in
-    img attrs []
+    img (src head :: tail) []
 
 
 
