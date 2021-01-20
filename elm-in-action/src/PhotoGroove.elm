@@ -15,9 +15,9 @@ urlPrefix =
 
 type Msg
     = ClickedPhoto String
-    | GotRandomPhoto Photo
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
+    | GotRandomPhoto Photo
 
 
 view : Model -> Html Msg
@@ -114,9 +114,6 @@ update msg model =
         ClickedPhoto url ->
             ( { model | status = selectUrl url model.status }, Cmd.none )
 
-        GotRandomPhoto photo ->
-            ( { model | status = selectUrl photo.url model.status }, Cmd.none )
-
         ClickedSize size ->
             ( { model | chosenSize = size }, Cmd.none )
 
@@ -133,6 +130,9 @@ update msg model =
 
                 Errored _ ->
                     ( model, Cmd.none )
+
+        GotRandomPhoto photo ->
+            ( { model | status = selectUrl photo.url model.status }, Cmd.none )
 
 
 selectUrl : String -> Status -> Status
