@@ -38,7 +38,7 @@ photoArray =
 
 photoListUrl : String
 photoListUrl =
-    "http://elm-in-action.com/list-photos"
+    "http://elm-in-action.com/"
 
 
 view : Model -> Html Msg
