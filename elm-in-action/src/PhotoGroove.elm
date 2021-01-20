@@ -15,8 +15,8 @@ type alias Picture =
     { url : String }
 
 
-type Msg
-    = NoOp
+type alias Msg =
+    { description : String, data : String }
 
 
 initModel : Model
@@ -58,6 +58,15 @@ viewThumbnail selectedUrl { url } =
                 []
     in
     img (src (urlPrefix ++ url) :: tail) []
+
+
+update : Msg -> Model -> Model
+update { description, data } model =
+    if description == "ClickedPhoto" then
+        { model | selectedUrl = data }
+
+    else
+        model
 
 
 main : Html Msg
