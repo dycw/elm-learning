@@ -2,8 +2,8 @@ module PhotoGroove exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Html exposing (Html, button, div, h1, img, text)
-import Html.Attributes exposing (class, classList, id, src)
+import Html exposing (Html, button, div, h1, img, input, label, text)
+import Html.Attributes exposing (class, classList, id, name, src, type_)
 import Html.Events exposing (onClick)
 import String exposing (String)
 
@@ -74,6 +74,27 @@ viewThumbnail selectedUrl { url } =
         , onClick { description = "ClickedPhoto", data = url }
         ]
         []
+
+
+viewSizeChooser : ThumbnailSize -> Html Msg
+viewSizeChooser size =
+    label []
+        [ input [ type_ "radio", name "size" ] []
+        , text (sizeToString size)
+        ]
+
+
+sizeToString : ThumbnailSize -> String
+sizeToString size =
+    case size of
+        Small ->
+            "small"
+
+        Medium ->
+            "med"
+
+        Large ->
+            "large"
 
 
 update : Msg -> Model -> Model
