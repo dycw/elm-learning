@@ -71,4 +71,4 @@ update { description, data } model =
 main : Program () Model Msg
 main =
     Browser.sandbox
-        { init = initModel, update = update, view = view }
+        { init = initModel, view = view, update = update }
