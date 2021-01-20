@@ -4575,23 +4575,72 @@ type alias Process =
           var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
           var $author$project$PhotoGroove$urlPrefix =
             "http://elm-in-action.com/";
+          var $elm$core$List$filter = F2(function (isGood, list) {
+            return A3(
+              $elm$core$List$foldr,
+              F2(function (x, xs) {
+                return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+              }),
+              _List_Nil,
+              list
+            );
+          });
+          var $elm$core$Tuple$second = function (_v0) {
+            var y = _v0.b;
+            return y;
+          };
+          var $elm$html$Html$Attributes$classList = function (classes) {
+            return $elm$html$Html$Attributes$class(
+              A2(
+                $elm$core$String$join,
+                " ",
+                A2(
+                  $elm$core$List$map,
+                  $elm$core$Tuple$first,
+                  A2($elm$core$List$filter, $elm$core$Tuple$second, classes)
+                )
+              )
+            );
+          };
+          var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+            return { $: "Normal", a: a };
+          };
+          var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+          var $elm$html$Html$Events$on = F2(function (event, decoder) {
+            return A2(
+              $elm$virtual_dom$VirtualDom$on,
+              event,
+              $elm$virtual_dom$VirtualDom$Normal(decoder)
+            );
+          });
+          var $elm$html$Html$Events$onClick = function (msg) {
+            return A2(
+              $elm$html$Html$Events$on,
+              "click",
+              $elm$json$Json$Decode$succeed(msg)
+            );
+          };
           var $author$project$PhotoGroove$viewThumbnail = F2(function (
             selectedUrl,
             _v0
           ) {
             var url = _v0.url;
-            var tail = _Utils_eq(selectedUrl, url)
-              ? _List_fromArray([$elm$html$Html$Attributes$class("selected")])
-              : _List_Nil;
             return A2(
               $elm$html$Html$img,
-              A2(
-                $elm$core$List$cons,
+              _List_fromArray([
                 $elm$html$Html$Attributes$src(
                   _Utils_ap($author$project$PhotoGroove$urlPrefix, url)
                 ),
-                tail
-              ),
+                $elm$html$Html$Attributes$classList(
+                  _List_fromArray([
+                    _Utils_Tuple2("selected", _Utils_eq(selectedUrl, url)),
+                  ])
+                ),
+                $elm$html$Html$Events$onClick({
+                  data: url,
+                  description: "ClickedPhoto",
+                }),
+              ]),
               _List_Nil
             );
           });

@@ -1,7 +1,8 @@
 module PhotoGroove exposing (main)
 
 import Html exposing (Html, div, h1, img, text)
-import Html.Attributes exposing (class, id, src)
+import Html.Attributes exposing (class, classList, id, src)
+import Html.Events exposing (onClick)
 import String exposing (String)
 
 
@@ -47,17 +48,14 @@ view { photos, selectedUrl } =
         ]
 
 
-viewThumbnail : String -> Picture -> Html msg
+viewThumbnail : String -> Picture -> Html Msg
 viewThumbnail selectedUrl { url } =
-    let
-        tail =
-            if selectedUrl == url then
-                [ class "selected" ]
-
-            else
-                []
-    in
-    img (src (urlPrefix ++ url) :: tail) []
+    img
+        [ src (urlPrefix ++ url)
+        , classList [ ( "selected", selectedUrl == url ) ]
+        , onClick { description = "ClickedPhoto", data = url }
+        ]
+        []
 
 
 update : Msg -> Model -> Model
