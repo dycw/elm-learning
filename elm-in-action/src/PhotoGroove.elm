@@ -15,10 +15,10 @@ type alias Model =
     }
 
 
-type alias Msg =
-    { description : String
-    , data : String
-    }
+type Msg
+    = ClickedPhoto String
+    | ClickedSize ThumbnailSize
+    | ClickedSurpriseMe
 
 
 type alias Photo =
@@ -57,7 +57,7 @@ view : Model -> Html Msg
 view { photos, selectedUrl, chosenSize } =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
-        , button [ onClick { description = "ClickedSurpriseMe", data = "" } ] [ text "Surprise Me!" ]
+        , button [ onClick ClickedSurpriseMe ] [ text "Surprise Me!" ]
         , h3 [] [ text "Thumbnail size:" ]
         , div [ id "choose-size" ] (List.map viewSizeChooser [ Small, Medium, Large ])
         , div [ id "thumbnails", class (sizeToString chosenSize) ]
@@ -73,7 +73,7 @@ viewThumbnail selectedUrl { url } =
     img
         [ src (photoListUrl ++ url)
         , classList [ ( "selected", selectedUrl == url ) ]
-        , onClick { description = "ClickedPhoto", data = url }
+        , onClick ClickedSurpriseMe
         ]
         []
 
@@ -81,7 +81,7 @@ viewThumbnail selectedUrl { url } =
 viewSizeChooser : ThumbnailSize -> Html Msg
 viewSizeChooser size =
     label []
-        [ input [ type_ "radio", name "size" ] []
+        [ input [ type_ "radio", name "size", onClick (ClickedSize size) ] []
         , text (sizeToString size)
         ]
 
@@ -110,16 +110,16 @@ getPhotoUrl index =
 
 
 update : Msg -> Model -> Model
-update { description, data } model =
-    case description of
-        "ClickedPhoto" ->
-            { model | selectedUrl = data }
+update msg model =
+    case msg of
+        ClickedPhoto url ->
+            { model | selectedUrl = url }
 
-        "ClickedSurprisedMe" ->
+        ClickedSize size ->
+            { model | chosenSize = size }
+
+        ClickedSurpriseMe ->
             { model | selectedUrl = "2.jpeg" }
-
-        _ ->
-            model
 
 
 main : Program () Model Msg
