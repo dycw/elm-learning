@@ -1,28 +1,27 @@
 module PhotoGroove exposing (main)
 
+import Array exposing (Array)
 import Browser
-import Html exposing (Html, div, h1, img, text)
+import Html exposing (Html, button, div, h1, img, text)
 import Html.Attributes exposing (class, classList, id, src)
 import Html.Events exposing (onClick)
 import String exposing (String)
 
 
 type alias Model =
-    { photos : List Picture
-    , selectedUrl : String
-    }
-
-
-type alias Picture =
-    { url : String }
+    { photos : List Photo, selectedUrl : String }
 
 
 type alias Msg =
     { description : String, data : String }
 
 
-initModel : Model
-initModel =
+type alias Photo =
+    { url : String }
+
+
+init : Model
+init =
     { photos =
         [ { url = "1.jpeg" }
         , { url = "2.jpeg" }
@@ -32,27 +31,33 @@ initModel =
     }
 
 
-urlPrefix : String
-urlPrefix =
-    "http://elm-in-action.com/"
+photoArray : Array Photo
+photoArray =
+    Array.fromList init.photos
+
+
+photoListUrl : String
+photoListUrl =
+    "http://elm-in-action.com/list-photos"
 
 
 view : Model -> Html Msg
 view { photos, selectedUrl } =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
+        , button [ onClick { description = "ClickedSurpriseMe", data = "" } ] [ text "Surprise Me!" ]
         , div [ id "thumbnails" ]
             (List.map (viewThumbnail selectedUrl) photos)
         , img
-            [ class "large", src (urlPrefix ++ "large/" ++ selectedUrl) ]
+            [ class "large", src (photoListUrl ++ "large/" ++ selectedUrl) ]
             []
         ]
 
 
-viewThumbnail : String -> Picture -> Html Msg
+viewThumbnail : String -> Photo -> Html Msg
 viewThumbnail selectedUrl { url } =
     img
-        [ src (urlPrefix ++ url)
+        [ src (photoListUrl ++ url)
         , classList [ ( "selected", selectedUrl == url ) ]
         , onClick { description = "ClickedPhoto", data = url }
         ]
@@ -64,6 +69,9 @@ update { description, data } model =
     if description == "ClickedPhoto" then
         { model | selectedUrl = data }
 
+    else if description == "ClickedSurprisedMe" then
+        { model | selectedUrl = "2.jpeg" }
+
     else
         model
 
@@ -71,4 +79,4 @@ update { description, data } model =
 main : Program () Model Msg
 main =
     Browser.sandbox
-        { init = initModel, view = view, update = update }
+        { init = init, view = view, update = update }
