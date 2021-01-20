@@ -9,15 +9,26 @@ import String exposing (String)
 
 
 type alias Model =
-    { photos : List Photo, selectedUrl : String }
+    { photos : List Photo
+    , selectedUrl : String
+    , chosenSize : ThumbnailSize
+    }
 
 
 type alias Msg =
-    { description : String, data : String }
+    { description : String
+    , data : String
+    }
 
 
 type alias Photo =
     { url : String }
+
+
+type ThumbnailSize
+    = Small
+    | Medium
+    | Large
 
 
 init : Model
@@ -28,6 +39,7 @@ init =
         , { url = "3.jpeg" }
         ]
     , selectedUrl = "1.jpeg"
+    , chosenSize = Medium
     }
 
 
