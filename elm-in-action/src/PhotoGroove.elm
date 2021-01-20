@@ -2,6 +2,7 @@ module PhotoGroove exposing (main)
 
 import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (class, id, src)
+import String exposing (String)
 
 
 type alias Model =
@@ -18,6 +19,11 @@ initModel =
     , { url = "2.jpeg" }
     , { url = "3.jpeg" }
     ]
+
+
+urlPrefix : String
+urlPrefix =
+    "http://elm-in-action.com/"
 
 
 view : Model -> Html Msg
