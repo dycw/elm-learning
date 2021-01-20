@@ -73,7 +73,7 @@ viewThumbnail selectedUrl { url } =
     img
         [ src (photoListUrl ++ url)
         , classList [ ( "selected", selectedUrl == url ) ]
-        , onClick ClickedSurpriseMe
+        , onClick (ClickedPhoto url)
         ]
         []
 
