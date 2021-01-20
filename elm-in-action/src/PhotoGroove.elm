@@ -39,7 +39,7 @@ init =
         , { url = "3.jpeg" }
         ]
     , selectedUrl = "1.jpeg"
-    , chosenSize = Medium
+    , chosenSize = Small
     }
 
 
@@ -97,6 +97,16 @@ sizeToString size =
 
         Large ->
             "large"
+
+
+getPhotoUrl : Int -> String
+getPhotoUrl index =
+    case Array.get index photoArray of
+        Just photo ->
+            photo.url
+
+        Nothing ->
+            ""
 
 
 update : Msg -> Model -> Model
