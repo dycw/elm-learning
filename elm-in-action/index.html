@@ -4577,25 +4577,27 @@ type alias Process =
             "http://elm-in-action.com/";
           var $author$project$PhotoGroove$viewThumbnail = F2(function (
             selectedUrl,
-            thumb
+            _v0
           ) {
-            var url = thumb.url;
+            var url = _v0.url;
             var tail = _Utils_eq(selectedUrl, url)
               ? _List_fromArray([$elm$html$Html$Attributes$class("selected")])
               : _List_Nil;
-            var head = _Utils_ap($author$project$PhotoGroove$urlPrefix, url);
             return A2(
               $elm$html$Html$img,
               A2(
                 $elm$core$List$cons,
-                $elm$html$Html$Attributes$src(head),
+                $elm$html$Html$Attributes$src(
+                  _Utils_ap($author$project$PhotoGroove$urlPrefix, url)
+                ),
                 tail
               ),
               _List_Nil
             );
           });
-          var $author$project$PhotoGroove$view = function (model) {
-            var url = model.selectedUrl;
+          var $author$project$PhotoGroove$view = function (_v0) {
+            var photos = _v0.photos;
+            var selectedUrl = _v0.selectedUrl;
             return A2(
               $elm$html$Html$div,
               _List_fromArray([$elm$html$Html$Attributes$class("content")]),
@@ -4610,8 +4612,8 @@ type alias Process =
                   _List_fromArray([$elm$html$Html$Attributes$id("thumbnails")]),
                   A2(
                     $elm$core$List$map,
-                    $author$project$PhotoGroove$viewThumbnail(url),
-                    model.photos
+                    $author$project$PhotoGroove$viewThumbnail(selectedUrl),
+                    photos
                   )
                 ),
                 A2(
@@ -4619,7 +4621,8 @@ type alias Process =
                   _List_fromArray([
                     $elm$html$Html$Attributes$class("large"),
                     $elm$html$Html$Attributes$src(
-                      $author$project$PhotoGroove$urlPrefix + ("large/" + url)
+                      $author$project$PhotoGroove$urlPrefix +
+                        ("large/" + selectedUrl)
                     ),
                   ]),
                   _List_Nil
