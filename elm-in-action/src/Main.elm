@@ -1,8 +1,7 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, text)
 
 
 type alias Model =
@@ -30,17 +29,18 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [] [ text "hello world" ]
+    div [] [ text "hello worlddd" ]
 
 
 
 -- INIT
 
 
-main : Program () Model Msg
+main : Program Never Model Msg
 main =
-    Browser.sandbox
-        { init = ()
+    Html.program
+        { init = init
         , update = update
+        , subscriptions = \_ -> Sub.none
         , view = view
         }
