@@ -2,7 +2,7 @@ module PhotoGroove exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Html exposing (Html, button, div, h1, img, input, label, text)
+import Html exposing (Html, button, div, h1, h3, img, input, label, text)
 import Html.Attributes exposing (class, classList, id, name, src, type_)
 import Html.Events exposing (onClick)
 import String exposing (String)
@@ -58,6 +58,8 @@ view { photos, selectedUrl } =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , button [ onClick { description = "ClickedSurpriseMe", data = "" } ] [ text "Surprise Me!" ]
+        , h3 [] [ text "Thumbnail size:" ]
+        , div [ id "choose-size" ] (List.map viewSizeChooser [ Small, Medium, Large ])
         , div [ id "thumbnails" ]
             (List.map (viewThumbnail selectedUrl) photos)
         , img
