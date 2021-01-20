@@ -54,13 +54,13 @@ photoListUrl =
 
 
 view : Model -> Html Msg
-view { photos, selectedUrl } =
+view { photos, selectedUrl, chosenSize } =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , button [ onClick { description = "ClickedSurpriseMe", data = "" } ] [ text "Surprise Me!" ]
         , h3 [] [ text "Thumbnail size:" ]
         , div [ id "choose-size" ] (List.map viewSizeChooser [ Small, Medium, Large ])
-        , div [ id "thumbnails" ]
+        , div [ id "thumbnails", class (sizeToString chosenSize) ]
             (List.map (viewThumbnail selectedUrl) photos)
         , img
             [ class "large", src (photoListUrl ++ "large/" ++ selectedUrl) ]
