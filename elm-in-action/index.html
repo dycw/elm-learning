@@ -4487,6 +4487,11 @@ type alias Process =
                 return 3;
             }
           };
+          var $author$project$PhotoGroove$initModel = _List_fromArray([
+            { url: "1.jpeg" },
+            { url: "2.jpeg" },
+            { url: "3.jpeg" },
+          ]);
           var $elm$json$Json$Encode$string = _Json_wrap;
           var $elm$html$Html$Attributes$stringProperty = F2(function (
             key,
@@ -4563,7 +4568,7 @@ type alias Process =
             );
           };
           var $author$project$PhotoGroove$main = $author$project$PhotoGroove$view(
-            "no model yet"
+            $author$project$PhotoGroove$initModel
           );
           _Platform_export({
             PhotoGroove: {

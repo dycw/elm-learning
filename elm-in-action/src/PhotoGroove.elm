@@ -5,11 +5,19 @@ import Html.Attributes exposing (class, id, src)
 
 
 type alias Model =
-    String
+    List { url : String }
 
 
 type Msg
     = NoOp
+
+
+initModel : Model
+initModel =
+    [ { url = "1.jpeg" }
+    , { url = "2.jpeg" }
+    , { url = "3.jpeg" }
+    ]
 
 
 view : Model -> Html Msg
@@ -26,4 +34,4 @@ view model =
 
 main : Html Msg
 main =
-    view "no model yet"
+    view initModel
