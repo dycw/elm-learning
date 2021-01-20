@@ -5,16 +5,14 @@ repos:
       - id: elm
       - id: markdown
       - id: no-binary
+        exclude: waterfall.jpg
       - id: no-commit
       - id: notebook
       - id: prettier
       - id: python
       - id: shell-exec
       - id: shell-non-exec
-        exclude: bash-completion.bash
       - id: shellcheck
-        exclude: bash-completion.bash
       - id: shfmt
-        exclude: bash-completion.bash
       - id: text
       - id: universal
