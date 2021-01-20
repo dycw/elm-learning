@@ -38,14 +38,16 @@ urlPrefix =
 
 view : Model -> Html Msg
 view model =
+    let
+        url =
+            model.selectedUrl
+    in
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , div [ id "thumbnails" ]
-            (List.map (viewThumbnail model.selectedUrl) model.photos)
+            (List.map (viewThumbnail url) model.photos)
         , img
-            [ class "large"
-            , src (urlPrefix ++ "large/" ++ model.selectedUrl)
-            ]
+            [ class "large", src (urlPrefix ++ "large/" ++ url) ]
             []
         ]
 
@@ -67,16 +69,6 @@ viewThumbnail selectedUrl thumb =
                 []
     in
     img (src head :: tail) []
-
-
-
--- if selectedUrl == thumb.url then
---     img [ src (urlPrefix ++ thumb.url), class "selected" ] []
--- else
---     img [ src (urlPrefix ++ thumb.url) ] []
--- img [ src "http://elm-in-action.com/1.jpeg" ] []
--- , img [ src "http://elm-in-action.com/2.jpeg" ] []
--- , img [ src "http://elm-in-action.com/3.jpeg" ] []
 
 
 main : Html Msg

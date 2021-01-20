@@ -4595,6 +4595,7 @@ type alias Process =
             );
           });
           var $author$project$PhotoGroove$view = function (model) {
+            var url = model.selectedUrl;
             return A2(
               $elm$html$Html$div,
               _List_fromArray([$elm$html$Html$Attributes$class("content")]),
@@ -4609,9 +4610,7 @@ type alias Process =
                   _List_fromArray([$elm$html$Html$Attributes$id("thumbnails")]),
                   A2(
                     $elm$core$List$map,
-                    $author$project$PhotoGroove$viewThumbnail(
-                      model.selectedUrl
-                    ),
+                    $author$project$PhotoGroove$viewThumbnail(url),
                     model.photos
                   )
                 ),
@@ -4620,8 +4619,7 @@ type alias Process =
                   _List_fromArray([
                     $elm$html$Html$Attributes$class("large"),
                     $elm$html$Html$Attributes$src(
-                      $author$project$PhotoGroove$urlPrefix +
-                        ("large/" + model.selectedUrl)
+                      $author$project$PhotoGroove$urlPrefix + ("large/" + url)
                     ),
                   ]),
                   _List_Nil
