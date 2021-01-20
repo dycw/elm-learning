@@ -5,7 +5,7 @@ import Browser
 import Html exposing (Html, button, div, h1, h3, img, input, label, text)
 import Html.Attributes exposing (class, classList, id, name, src, type_)
 import Html.Events exposing (onClick)
-import String exposing (String)
+import Random
 
 
 type alias Model =
@@ -107,6 +107,11 @@ getPhotoUrl index =
 
         Nothing ->
             ""
+
+
+randomPhotoPicker : Random.Generator Int
+randomPhotoPicker =
+    Random.int 0 (Array.length photoArray - 1)
 
 
 update : Msg -> Model -> Model
