@@ -66,14 +66,15 @@ viewThumbnail selectedUrl { url } =
 
 update : Msg -> Model -> Model
 update { description, data } model =
-    if description == "ClickedPhoto" then
-        { model | selectedUrl = data }
+    case description of
+        "ClickedPhoto" ->
+            { model | selectedUrl = data }
 
-    else if description == "ClickedSurprisedMe" then
-        { model | selectedUrl = "2.jpeg" }
+        "ClickedSurprisedMe" ->
+            { model | selectedUrl = "2.jpeg" }
 
-    else
-        model
+        _ ->
+            model
 
 
 main : Program () Model Msg
