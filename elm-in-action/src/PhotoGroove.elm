@@ -7,10 +7,12 @@ import String exposing (String)
 
 
 type alias Model =
-    List Thumbnail
+    { photos : List Picture
+    , selectedUrl : String
+    }
 
 
-type alias Thumbnail =
+type alias Picture =
     { url : String }
 
 
@@ -20,10 +22,13 @@ type Msg
 
 initModel : Model
 initModel =
-    [ { url = "1.jpeg" }
-    , { url = "2.jpeg" }
-    , { url = "3.jpeg" }
-    ]
+    { photos =
+        [ { url = "1.jpeg" }
+        , { url = "2.jpeg" }
+        , { url = "3.jpeg" }
+        ]
+    , selectedUrl = "1.jpeg"
+    }
 
 
 urlPrefix : String
@@ -36,13 +41,22 @@ view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , div [ id "thumbnails" ]
-            (List.map viewThumbnail initModel)
+            (List.map (\t -> viewThumbnail model.selectedUrl t) model.photos)
+        , img
+            [ class "large"
+            , src (urlPrefix ++ "large/" ++ model.selectedUrl)
+            ]
+            []
         ]
 
 
-viewThumbnail : Thumbnail -> Html msg
-viewThumbnail thumb =
-    img [ src (urlPrefix ++ thumb.url) ] []
+viewThumbnail : String -> Picture -> Html msg
+viewThumbnail selectedUrl thumb =
+    if selectedUrl == thumb.url then
+        img [ src (urlPrefix ++ thumb.url), class "selected" ] []
+
+    else
+        img [ src (urlPrefix ++ thumb.url) ] []
 
 
 
