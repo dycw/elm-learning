@@ -1,4 +1,4 @@
-module CustomElements exposing (CropData)
+module CustomElements exposing (main)
 
 import Asset
 import Browser
@@ -17,18 +17,25 @@ type alias CropData =
     }
 
 
-type Msg
-    = NoOp
-
-
 imageCrop : List (Attribute a) -> List (Html a) -> Html a
 imageCrop =
     Html.node "image-crop"
 
 
-init : () -> ( CropData, Cmd Msg )
-init flags =
-    ( { x = 297, y = 0, width = 906, height = 906 }, Cmd.none )
+onImageCropChange : Attribute Msg
+onImageCropChange =
+    cropDataDecoder
+        |> Decode.map UpdateCropData
+        |> on "image-crop-change"
+
+
+cropDataDecoder : Decoder CropData
+cropDataDecoder =
+    Decode.succeed CropData
+        |> requiredAt [ "detail", "x" ] int
+        |> requiredAt [ "detail", "y" ] int
+        |> requiredAt [ "detail", "width" ] int
+        |> requiredAt [ "detail", "height" ] int
 
 
 view : CropData -> Html Msg
@@ -38,16 +45,54 @@ view cropData =
         , imageCrop
             [ Asset.src Asset.waterfall
             , class "wrapper"
+            , onImageCropChange
             ]
             []
+        , viewCropData cropData
         ]
 
 
+viewCropData : CropData -> Html Msg
+viewCropData cropData =
+    div []
+        [ viewCropDataLabel "x" cropData.x
+        , viewCropDataLabel "y" cropData.y
+        , viewCropDataLabel "width" cropData.width
+        , viewCropDataLabel "height" cropData.height
+        ]
+
+
+viewCropDataLabel : String -> Int -> Html Msg
+viewCropDataLabel name value =
+    div []
+        [ strong [] [ text (name ++ " : ") ]
+        , text (String.fromInt value)
+        ]
+
+
+type Msg
+    = UpdateCropData CropData
+
+
 update : Msg -> CropData -> ( CropData, Cmd Msg )
-update msg cropData =
+update msg oldCropData =
     case msg of
-        NoOp ->
-            ( cropData, Cmd.none )
+        UpdateCropData newCropData ->
+            ( newCropData, Cmd.none )
+
+
+initialModel : CropData
+initialModel =
+    { x = 297
+    , y = 0
+    , width = 906
+    , height = 906
+    }
+
+
+init : () -> ( CropData, Cmd Msg )
+init flags =
+    ( initialModel, Cmd.none )
 
 
 main : Program () CropData Msg

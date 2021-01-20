@@ -5010,18 +5010,25 @@ type alias Process =
     );
   });
   var $elm$browser$Browser$element = _Browser_element;
+  var $author$project$CustomElements$initialModel = {
+    height: 906,
+    width: 906,
+    x: 297,
+    y: 0,
+  };
   var $elm$core$Platform$Cmd$batch = _Platform_batch;
   var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
   var $author$project$CustomElements$init = function (flags) {
     return _Utils_Tuple2(
-      { height: 906, width: 906, x: 297, y: 0 },
+      $author$project$CustomElements$initialModel,
       $elm$core$Platform$Cmd$none
     );
   };
   var $elm$core$Platform$Sub$batch = _Platform_batch;
   var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-  var $author$project$CustomElements$update = F2(function (msg, cropData) {
-    return _Utils_Tuple2(cropData, $elm$core$Platform$Cmd$none);
+  var $author$project$CustomElements$update = F2(function (msg, oldCropData) {
+    var newCropData = msg.a;
+    return _Utils_Tuple2(newCropData, $elm$core$Platform$Cmd$none);
   });
   var $elm$json$Json$Encode$string = _Json_wrap;
   var $elm$html$Html$Attributes$stringProperty = F2(function (key, string) {
@@ -5039,6 +5046,80 @@ type alias Process =
   var $author$project$CustomElements$imageCrop = $elm$html$Html$node(
     "image-crop"
   );
+  var $author$project$CustomElements$UpdateCropData = function (a) {
+    return { $: "UpdateCropData", a: a };
+  };
+  var $author$project$CustomElements$CropData = F4(function (
+    x,
+    y,
+    width,
+    height
+  ) {
+    return { height: height, width: width, x: x, y: y };
+  });
+  var $elm$json$Json$Decode$int = _Json_decodeInt;
+  var $elm$json$Json$Decode$field = _Json_decodeField;
+  var $elm$json$Json$Decode$at = F2(function (fields, decoder) {
+    return A3(
+      $elm$core$List$foldr,
+      $elm$json$Json$Decode$field,
+      decoder,
+      fields
+    );
+  });
+  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2(
+    $elm$core$Basics$apR
+  );
+  var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$requiredAt = F3(
+    function (path, valDecoder, decoder) {
+      return A2(
+        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom,
+        A2($elm$json$Json$Decode$at, path, valDecoder),
+        decoder
+      );
+    }
+  );
+  var $author$project$CustomElements$cropDataDecoder = A3(
+    $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$requiredAt,
+    _List_fromArray(["detail", "height"]),
+    $elm$json$Json$Decode$int,
+    A3(
+      $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$requiredAt,
+      _List_fromArray(["detail", "width"]),
+      $elm$json$Json$Decode$int,
+      A3(
+        $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$requiredAt,
+        _List_fromArray(["detail", "y"]),
+        $elm$json$Json$Decode$int,
+        A3(
+          $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$requiredAt,
+          _List_fromArray(["detail", "x"]),
+          $elm$json$Json$Decode$int,
+          $elm$json$Json$Decode$succeed($author$project$CustomElements$CropData)
+        )
+      )
+    )
+  );
+  var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+    return { $: "Normal", a: a };
+  };
+  var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+  var $elm$html$Html$Events$on = F2(function (event, decoder) {
+    return A2(
+      $elm$virtual_dom$VirtualDom$on,
+      event,
+      $elm$virtual_dom$VirtualDom$Normal(decoder)
+    );
+  });
+  var $author$project$CustomElements$onImageCropChange = A2(
+    $elm$html$Html$Events$on,
+    "image-crop-change",
+    A2(
+      $elm$json$Json$Decode$map,
+      $author$project$CustomElements$UpdateCropData,
+      $author$project$CustomElements$cropDataDecoder
+    )
+  );
   var $elm$html$Html$Attributes$src = function (url) {
     return A2(
       $elm$html$Html$Attributes$stringProperty,
@@ -5052,6 +5133,44 @@ type alias Process =
   };
   var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
   var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+  var $elm$html$Html$strong = _VirtualDom_node("strong");
+  var $author$project$CustomElements$viewCropDataLabel = F2(function (
+    name,
+    value
+  ) {
+    return A2(
+      $elm$html$Html$div,
+      _List_Nil,
+      _List_fromArray([
+        A2(
+          $elm$html$Html$strong,
+          _List_Nil,
+          _List_fromArray([$elm$html$Html$text(name + " : ")])
+        ),
+        $elm$html$Html$text($elm$core$String$fromInt(value)),
+      ])
+    );
+  });
+  var $author$project$CustomElements$viewCropData = function (cropData) {
+    return A2(
+      $elm$html$Html$div,
+      _List_Nil,
+      _List_fromArray([
+        A2($author$project$CustomElements$viewCropDataLabel, "x", cropData.x),
+        A2($author$project$CustomElements$viewCropDataLabel, "y", cropData.y),
+        A2(
+          $author$project$CustomElements$viewCropDataLabel,
+          "width",
+          cropData.width
+        ),
+        A2(
+          $author$project$CustomElements$viewCropDataLabel,
+          "height",
+          cropData.height
+        ),
+      ])
+    );
+  };
   var $author$project$Asset$Image = function (a) {
     return { $: "Image", a: a };
   };
@@ -5076,9 +5195,11 @@ type alias Process =
           _List_fromArray([
             $author$project$Asset$src($author$project$Asset$waterfall),
             $elm$html$Html$Attributes$class("wrapper"),
+            $author$project$CustomElements$onImageCropChange,
           ]),
           _List_Nil
         ),
+        $author$project$CustomElements$viewCropData(cropData),
       ])
     );
   };
