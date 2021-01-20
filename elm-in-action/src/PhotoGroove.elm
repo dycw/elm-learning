@@ -52,14 +52,27 @@ view model =
 
 viewThumbnail : String -> Picture -> Html msg
 viewThumbnail selectedUrl thumb =
-    if selectedUrl == thumb.url then
-        img [ src (urlPrefix ++ thumb.url), class "selected" ] []
+    let
+        url =
+            thumb.url
 
-    else
-        img [ src (urlPrefix ++ thumb.url) ] []
+        attrs =
+            src (urlPrefix ++ url)
+                :: (if selectedUrl == url then
+                        [ class "selected" ]
+
+                    else
+                        []
+                   )
+    in
+    img attrs []
 
 
 
+-- if selectedUrl == thumb.url then
+--     img [ src (urlPrefix ++ thumb.url), class "selected" ] []
+-- else
+--     img [ src (urlPrefix ++ thumb.url) ] []
 -- img [ src "http://elm-in-action.com/1.jpeg" ] []
 -- , img [ src "http://elm-in-action.com/2.jpeg" ] []
 -- , img [ src "http://elm-in-action.com/3.jpeg" ] []
