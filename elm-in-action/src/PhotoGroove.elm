@@ -1,5 +1,6 @@
 module PhotoGroove exposing (main)
 
+import Browser
 import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (class, classList, id, src)
 import Html.Events exposing (onClick)
@@ -67,6 +68,7 @@ update { description, data } model =
         model
 
 
-main : Html Msg
+main : Program () Model Msg
 main =
-    view initModel
+    Browser.sandbox
+        { init = initModel, update = update, view = view }
