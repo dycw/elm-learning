@@ -41,7 +41,7 @@ view model =
     div [ class "content" ]
         [ h1 [] [ text "Photo Groove" ]
         , div [ id "thumbnails" ]
-            (List.map (\t -> viewThumbnail model.selectedUrl t) model.photos)
+            (List.map (viewThumbnail model.selectedUrl) model.photos)
         , img
             [ class "large"
             , src (urlPrefix ++ "large/" ++ model.selectedUrl)

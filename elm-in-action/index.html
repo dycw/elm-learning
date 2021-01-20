@@ -4606,13 +4606,9 @@ type alias Process =
                   _List_fromArray([$elm$html$Html$Attributes$id("thumbnails")]),
                   A2(
                     $elm$core$List$map,
-                    function (t) {
-                      return A2(
-                        $author$project$PhotoGroove$viewThumbnail,
-                        model.selectedUrl,
-                        t
-                      );
-                    },
+                    $author$project$PhotoGroove$viewThumbnail(
+                      model.selectedUrl
+                    ),
                     model.photos
                   )
                 ),
