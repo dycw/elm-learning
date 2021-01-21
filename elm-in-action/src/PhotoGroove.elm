@@ -135,25 +135,23 @@ update msg model =
         GotRandomPhoto photo ->
             ( { model | status = selectUrl photo.url model.status }, Cmd.none )
 
-        GotPhotos result ->
-            case result of
-                Ok response ->
-                    let
-                        urls =
-                            response |> String.split ","
+        GotPhotos (Ok response) ->
+            let
+                urls =
+                    response |> String.split ","
 
-                        status =
-                            case urls of
-                                first :: _ ->
-                                    Loaded (List.map Photo urls) first
+                status =
+                    case urls of
+                        first :: _ ->
+                            Loaded (List.map Photo urls) first
 
-                                [] ->
-                                    Errored "No photos found"
-                    in
-                    ( { model | status = status }, Cmd.none )
+                        [] ->
+                            Errored "No photos found"
+            in
+            ( { model | status = status }, Cmd.none )
 
-                Err _ ->
-                    ( { model | status = Errored "Server error!" }, Cmd.none )
+        GotPhotos (Err _) ->
+            ( { model | status = Errored "Server error!" }, Cmd.none )
 
 
 selectUrl : String -> Status -> Status
