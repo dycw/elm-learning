@@ -21,6 +21,7 @@ type Msg
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
     | GotRandomPhoto Photo
+    | GotActivity String
     | GotPhotos (Result Http.Error (List Photo))
     | SlidHue Int
     | SlidRipple Int
@@ -143,6 +144,7 @@ type Status
 
 type alias Model =
     { status : Status
+    , activity : String
     , chosenSize : ThumbnailSize
     , hue : Int
     , ripple : Int
@@ -153,6 +155,7 @@ type alias Model =
 initialModel : Model
 initialModel =
     { status = Loading
+    , activity = ""
     , chosenSize = Medium
     , hue = 5
     , ripple = 5
@@ -165,6 +168,9 @@ update msg model =
     case msg of
         GotRandomPhoto photo ->
             applyFilters { model | status = selectUrl photo.url model.status }
+
+        GotActivity activity ->
+            ( { model | activity = activity }, Cmd.none )
 
         ClickedPhoto url ->
             applyFilters { model | status = selectUrl url model.status }
