@@ -1,10 +1,23 @@
-module PhotoGrooveTests exposing (..)
+module PhotoGrooveTests exposing (decoderTest)
 
 import Expect exposing (Expectation, equal)
 import Fuzz exposing (Fuzzer, int, list, string)
+import Json.Decode exposing (decodeString)
+import PhotoGroove exposing (photoDecoder)
 import Test exposing (Test, test)
 
 
-suite : Test
-suite =
-    test "first test" (\_ -> equal 2 (1 + 1))
+decoderTest : Test
+decoderTest =
+    test "title defaults"
+        (\_ ->
+            """{"url": "fruits.com", "size": 5}"""
+                |> decodeString photoDecoder
+                |> equal
+                    (Ok
+                        { url = "fruits.com"
+                        , size = 5
+                        , title = "(untitled)"
+                        }
+                    )
+        )
