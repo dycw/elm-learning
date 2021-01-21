@@ -137,8 +137,20 @@ update msg model =
 
         GotPhotos result ->
             case result of
-                Ok _ ->
-                    ( model, Cmd.none )
+                Ok response ->
+                    let
+                        urls =
+                            response |> String.split ","
+
+                        status =
+                            case urls of
+                                first :: _ ->
+                                    Loaded (List.map (\x -> { url = x }) urls) first
+
+                                [] ->
+                                    Errored "No photos found"
+                    in
+                    ( { model | status = status }, Cmd.none )
 
                 Err _ ->
                     ( { model | status = Errored "Server error!" }, Cmd.none )
