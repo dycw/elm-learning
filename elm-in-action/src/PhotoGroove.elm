@@ -149,7 +149,7 @@ update msg model =
                 [] ->
                     ( { model | status = Errored "0 photos found" }, Cmd.none )
 
-        GotPhotos (Err httpError) ->
+        GotPhotos (Err _) ->
             ( model, Cmd.none )
 
 
