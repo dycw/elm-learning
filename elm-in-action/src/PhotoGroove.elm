@@ -1,4 +1,4 @@
-module PhotoGroove exposing (main)
+port module PhotoGroove exposing (main)
 
 import Browser
 import Html exposing (Attribute, Html, button, div, h1, h3, img, input, label, node, text)
@@ -123,6 +123,15 @@ type ThumbnailSize
     | Large
 
 
+port setFilters : FilterOptions -> Cmd msg
+
+
+type alias FilterOptions =
+    { url : String
+    , filters : List { name : String, amount : Int }
+    }
+
+
 type alias Photo =
     { url : String
     , size : Int
@@ -161,8 +170,21 @@ update msg model =
         GotRandomPhoto photo ->
             ( { model | status = selectUrl photo.url model.status }, Cmd.none )
 
-        ClickedPhoto url ->
-            ( { model | status = selectUrl url model.status }, Cmd.none )
+        ClickedPhoto selectedUrl ->
+            let
+                filters =
+                    [ { name = "Hue", amount = model.hue }
+                    , { name = "Ripple", amount = model.ripple }
+                    , { name = "Noise", amount = model.noise }
+                    ]
+
+                url =
+                    urlPrefix ++ "large/" ++ selectedUrl
+
+                cmd =
+                    setFilters { url = url, filters = filters }
+            in
+            ( model, cmd )
 
         ClickedSize size ->
             ( { model | chosenSize = size }, Cmd.none )
