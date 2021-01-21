@@ -189,7 +189,7 @@ update msg model =
         GotPhotos (Ok photos) ->
             case photos of
                 first :: _ ->
-                    ( { model | status = Loaded photos first.url }, Cmd.none )
+                    applyFilters { model | status = Loaded photos first.url }
 
                 [] ->
                     ( { model | status = Errored "0 photos found" }, Cmd.none )
