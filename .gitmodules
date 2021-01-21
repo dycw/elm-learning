@@ -1,0 +1,3 @@
+[submodule "elm-in-action/official-repo"]
+	path = elm-in-action/official-repo
+	url = git@github.com:rtfeldman/elm-in-action.git

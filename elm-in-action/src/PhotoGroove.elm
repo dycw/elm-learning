@@ -1,10 +1,10 @@
 module PhotoGroove exposing (main)
 
+import Array exposing (Array)
 import Browser
-import Html exposing (Html, button, div, h1, h3, img, input, label, text)
-import Html.Attributes exposing (class, classList, id, name, src, type_)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
-import Http
 import Random
 
 
@@ -15,46 +15,37 @@ urlPrefix =
 
 type Msg
     = ClickedPhoto String
+    | GotSelectedIndex Int
     | ClickedSize ThumbnailSize
     | ClickedSurpriseMe
-    | GotRandomPhoto Photo
-    | GotPhotos (Result Http.Error String)
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "content" ] <|
-        case model.status of
-            Loading ->
-                []
-
-            Loaded photos url ->
-                viewLoaded photos url model.chosenSize
-
-            Errored msg ->
-                [ text ("Error: " ++ msg) ]
-
-
-viewLoaded : List Photo -> String -> ThumbnailSize -> List (Html Msg)
-viewLoaded photos url chosenSize =
-    [ h1 [] [ text "Photo Groove" ]
-    , button [ onClick ClickedSurpriseMe ] [ text "Surprise Me!" ]
-    , h3 [] [ text "Thumbnail size:" ]
-    , div [ id "choose-size" ] (List.map viewSizeChooser [ Small, Medium, Large ])
-    , div [ id "thumbnails", class (sizeToString chosenSize) ]
-        (List.map (viewThumbnail url) photos)
-    , img
-        [ class "large", src (urlPrefix ++ "large/" ++ url) ]
-        []
-    ]
+    div [ class "content" ]
+        [ h1 [] [ text "Photo Groove" ]
+        , button
+            [ onClick ClickedSurpriseMe ]
+            [ text "Surprise Me!" ]
+        , h3 [] [ text "Thumbnail Size:" ]
+        , div [ id "choose-size" ]
+            (List.map viewSizeChooser [ Small, Medium, Large ])
+        , div [ id "thumbnails", class (sizeToString model.chosenSize) ]
+            (List.map (viewThumbnail model.selectedUrl) model.photos)
+        , img
+            [ class "large"
+            , src (urlPrefix ++ "large/" ++ model.selectedUrl)
+            ]
+            []
+        ]
 
 
 viewThumbnail : String -> Photo -> Html Msg
-viewThumbnail selectedUrl { url } =
+viewThumbnail selectedUrl thumb =
     img
-        [ src (urlPrefix ++ url)
-        , classList [ ( "selected", selectedUrl == url ) ]
-        , onClick (ClickedPhoto url)
+        [ src (urlPrefix ++ thumb.url)
+        , classList [ ( "selected", selectedUrl == thumb.url ) ]
+        , onClick (ClickedPhoto thumb.url)
         ]
         []
 
@@ -90,96 +81,66 @@ type alias Photo =
     { url : String }
 
 
-type Status
-    = Loading
-    | Loaded (List Photo) String
-    | Errored String
-
-
 type alias Model =
-    { status : Status
+    { photos : List Photo
+    , selectedUrl : String
     , chosenSize : ThumbnailSize
     }
 
 
 initialModel : Model
 initialModel =
-    { status = Loading
+    { photos =
+        [ { url = "1.jpeg" }
+        , { url = "2.jpeg" }
+        , { url = "3.jpeg" }
+        ]
+    , selectedUrl = "1.jpeg"
     , chosenSize = Medium
     }
+
+
+photoArray : Array Photo
+photoArray =
+    Array.fromList initialModel.photos
+
+
+getPhotoUrl : Int -> String
+getPhotoUrl index =
+    case Array.get index photoArray of
+        Just photo ->
+            photo.url
+
+        Nothing ->
+            ""
+
+
+randomPhotoPicker : Random.Generator Int
+randomPhotoPicker =
+    Random.int 0 (Array.length photoArray - 1)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        GotSelectedIndex index ->
+            ( { model | selectedUrl = getPhotoUrl index }, Cmd.none )
+
         ClickedPhoto url ->
-            ( { model | status = selectUrl url model.status }, Cmd.none )
+            ( { model | selectedUrl = url }, Cmd.none )
 
         ClickedSize size ->
             ( { model | chosenSize = size }, Cmd.none )
 
         ClickedSurpriseMe ->
-            case model.status of
-                Loading ->
-                    ( model, Cmd.none )
-
-                Loaded [] _ ->
-                    ( model, Cmd.none )
-
-                Loaded (firstPhoto :: otherPhotos) _ ->
-                    Random.uniform firstPhoto otherPhotos |> Random.generate GotRandomPhoto |> Tuple.pair model
-
-                Errored _ ->
-                    ( model, Cmd.none )
-
-        GotRandomPhoto photo ->
-            ( { model | status = selectUrl photo.url model.status }, Cmd.none )
-
-        GotPhotos (Ok response) ->
-            let
-                urls =
-                    response |> String.split ","
-
-                status =
-                    case urls of
-                        first :: _ ->
-                            Loaded (List.map Photo urls) first
-
-                        [] ->
-                            Errored "No photos found"
-            in
-            ( { model | status = status }, Cmd.none )
-
-        GotPhotos (Err _) ->
-            ( { model | status = Errored "Server error!" }, Cmd.none )
-
-
-selectUrl : String -> Status -> Status
-selectUrl url status =
-    case status of
-        Loading ->
-            status
-
-        Loaded photos _ ->
-            Loaded photos url
-
-        Errored _ ->
-            status
-
-
-initialCmd : Cmd Msg
-initialCmd =
-    Http.get
-        { url = "http://elm-in-action.com/photos/lists"
-        , expect = Http.expectString GotPhotos
-        }
+            ( model, Random.generate GotSelectedIndex randomPhotoPicker )
 
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \_ -> ( initialModel, initialCmd )
+        { init = \flags -> ( initialModel, Cmd.none )
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = \model -> Sub.none
         }
