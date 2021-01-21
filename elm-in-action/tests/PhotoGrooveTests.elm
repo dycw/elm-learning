@@ -9,15 +9,9 @@ import Test exposing (Test, test)
 
 decoderTest : Test
 decoderTest =
-    test "title defaults"
-        (\_ ->
+    test "title defaults" <|
+        \_ ->
             """{"url": "fruits.com", "size": 5}"""
                 |> decodeString photoDecoder
-                |> equal
-                    (Ok
-                        { url = "fruits.com"
-                        , size = 5
-                        , title = "(untitled)"
-                        }
-                    )
-        )
+                |> Result.map .title
+                |> equal (Ok "(untitled)")
