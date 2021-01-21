@@ -81,6 +81,12 @@ type alias Photo =
     { url : String }
 
 
+type Status
+    = Loading
+    | Loaded (List Photo) String
+    | Errored String
+
+
 type alias Model =
     { photos : List Photo
     , selectedUrl : String
