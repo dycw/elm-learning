@@ -145,7 +145,7 @@ update msg model =
                         status =
                             case urls of
                                 first :: _ ->
-                                    Loaded (List.map (\x -> { url = x }) urls) first
+                                    Loaded (List.map Photo urls) first
 
                                 [] ->
                                     Errored "No photos found"
