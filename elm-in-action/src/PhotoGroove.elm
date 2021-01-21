@@ -148,7 +148,7 @@ update msg model =
 
         GotPhotos (Ok photos) ->
             case photos of
-                first :: rest ->
+                first :: _ ->
                     ( { model | status = Loaded photos first.url }, Cmd.none )
 
                 [] ->
