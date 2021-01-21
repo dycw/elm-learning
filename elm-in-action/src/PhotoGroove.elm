@@ -2,7 +2,7 @@ module PhotoGroove exposing (main)
 
 import Array exposing (Array)
 import Browser
-import Html exposing (Html, button, div, h1, h3, img, input, label, text)
+import Html exposing (Attribute, Html, button, div, h1, h3, img, input, label, node, text)
 import Html.Attributes exposing (class, classList, id, name, src, title, type_)
 import Html.Events exposing (onClick)
 import Http
@@ -197,3 +197,8 @@ main =
         , update = update
         , subscriptions = \_ -> Sub.none
         }
+
+
+rangeSlider : List (Attribute msg) -> List (Html msg) -> Html msg
+rangeSlider attributes children =
+    node "range-slider" attributes children
