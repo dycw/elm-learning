@@ -282,14 +282,21 @@ onSlide toMsg =
         |> on "slide"
 
 
-main : Program () Model Msg
+main : Program Float Model Msg
 main =
     Browser.element
-        { init = \_ -> ( initialModel, initialCmd )
+        { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
         }
+
+
+init : Float -> ( Model, Cmd Msg )
+init flags =
+    ( { initialModel | activity = "Initializing Pasta v" ++ String.fromFloat flags }
+    , initialCmd
+    )
 
 
 subscriptions : Model -> Sub Msg
