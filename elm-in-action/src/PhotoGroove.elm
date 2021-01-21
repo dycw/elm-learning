@@ -167,10 +167,6 @@ selectUrl url status =
             status
 
 
-
--- foo
-
-
 initialCmd : Cmd Msg
 initialCmd =
     Http.get
