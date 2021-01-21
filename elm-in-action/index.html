@@ -36,7 +36,11 @@
     <script src="http://elm-in-action.com/pasta.js"></script>
     <script src="app.js"></script>
     <script>
-      app = Elm.PhotoGroove.init({ node: document.getElementById("app") });
+      app = Elm.PhotoGroove.init({
+        node: document.getElementById("app"),
+
+        flags: Pasta.version,
+      });
 
       app.ports.setFilters.subscribe(function (options) {
         requestAnimationFrame(function () {
