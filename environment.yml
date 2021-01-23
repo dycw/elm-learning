@@ -3,3 +3,4 @@ name: elm-learning
 dependencies:
   - python = 3.9
   - bump2version
+  - pre-commit
