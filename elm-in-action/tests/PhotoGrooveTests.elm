@@ -1,11 +1,11 @@
-module PhotoGrooveTests exposing (decoderTest, decoderTest2, decoderTest3)
+module PhotoGrooveTests exposing (decoderTest, decoderTest2, decoderTest3, slidHueSetsHue, sliders)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Json.Decode as Decode exposing (decodeValue)
 import Json.Encode as Encode
 import PhotoGroove exposing (Model, Msg(..), initialModel, photoDecoder, update)
-import Test exposing (Test, fuzz, fuzz2, test)
+import Test exposing (Test, describe, fuzz, fuzz2, test)
 
 
 decoderTest : Test
@@ -52,4 +52,24 @@ slidHueSetsHue =
                 |> update (SlidHue amount)
                 |> Tuple.first
                 |> .hue
+                |> Expect.equal amount
+
+
+sliders : Test
+sliders =
+    describe "Slider sets the derised field in the Model"
+        [ testSlider "SlidHue" SlidHue .hue
+        , testSlider "SlidRipple" SlidRipple .ripple
+        , testSlider "SlidNoise" SlidNoise .noise
+        ]
+
+
+testSlider : String -> (Int -> Msg) -> (Model -> Int) -> Test
+testSlider description toMsg amountFromModel =
+    fuzz int description <|
+        \amount ->
+            initialModel
+                |> update (toMsg amount)
+                |> Tuple.first
+                |> amountFromModel
                 |> Expect.equal amount
