@@ -31,10 +31,13 @@ import PhotoGroove
     exposing
         ( Model
         , Msg(..)
+        , Photo
+        , Status(..)
         , initialModel
         , photoDecoder
         , update
         , urlPrefix
+        , view
         )
 import Test
     exposing
@@ -136,3 +139,25 @@ thumbnailRendered url query =
     query
         |> Query.findAll [ tag "img", attribute (Attr.src (urlPrefix ++ url)) ]
         |> Query.count (Expect.atLeast 1)
+
+
+photoFromUrl : String -> Photo
+photoFromUrl url =
+    { url = url, size = 0, title = "" }
+
+
+thumbnailsWork : Test
+thumbnailsWork =
+    fuzz (Fuzz.intRange 1 5) "URLs render as thumbnails" <|
+        \urlCount ->
+            let
+                urls =
+                    List.range 1 urlCount |> List.map (\num -> String.fromInt num ++ ".png")
+
+                thumbnailChecks =
+                    List.map thumbnailRendered urls
+            in
+            { initialModel | status = Loaded (List.map photoFromUrl urls) "" }
+                |> view
+                |> Query.fromHtml
+                |> Expect.all thumbnailChecks
