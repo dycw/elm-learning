@@ -1,5 +1,6 @@
 module PhotoGrooveTests exposing
-    ( decoderTest
+    ( clickThumbnail
+    , decoderTest
     , decoderTest2
     , decoderTest3
     , noPhotosNoThumbnails
@@ -16,13 +17,9 @@ import Fuzz
     exposing
         ( Fuzzer
         , int
-        , list
         , string
         )
 import Html.Attributes as Attr
-    exposing
-        ( src
-        )
 import Json.Decode as Decode
     exposing
         ( decodeValue
@@ -55,7 +52,6 @@ import Test.Html.Selector
     exposing
         ( attribute
         , tag
-        , text
         )
 
 
