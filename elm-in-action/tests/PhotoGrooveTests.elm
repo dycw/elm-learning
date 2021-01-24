@@ -1,11 +1,56 @@
-module PhotoGrooveTests exposing (decoderTest, decoderTest2, decoderTest3, slidHueSetsHue, sliders)
+module PhotoGrooveTests exposing
+    ( decoderTest
+    , decoderTest2
+    , decoderTest3
+    , noPhotosNoThumbnails
+    , slidHueSetsHue
+    , sliders
+    )
 
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import Json.Decode as Decode exposing (decodeValue)
+import Expect
+    exposing
+        ( Expectation
+        )
+import Fuzz
+    exposing
+        ( Fuzzer
+        , int
+        , list
+        , string
+        )
+import Html.Attributes as Attr
+    exposing
+        ( src
+        )
+import Json.Decode as Decode
+    exposing
+        ( decodeValue
+        )
 import Json.Encode as Encode
-import PhotoGroove exposing (Model, Msg(..), initialModel, photoDecoder, update)
-import Test exposing (Test, describe, fuzz, fuzz2, test)
+import PhotoGroove
+    exposing
+        ( Model
+        , Msg(..)
+        , initialModel
+        , photoDecoder
+        , update
+        , urlPrefix
+        )
+import Test
+    exposing
+        ( Test
+        , describe
+        , fuzz
+        , fuzz2
+        , test
+        )
+import Test.Html.Query as Query
+import Test.Html.Selector
+    exposing
+        ( attribute
+        , tag
+        , text
+        )
 
 
 decoderTest : Test
@@ -73,3 +118,21 @@ testSlider description toMsg amountFromModel =
                 |> Tuple.first
                 |> amountFromModel
                 |> Expect.equal amount
+
+
+noPhotosNoThumbnails : Test
+noPhotosNoThumbnails =
+    test "No thumbnails render when there are no photos to render." <|
+        \_ ->
+            initialModel
+                |> PhotoGroove.view
+                |> Query.fromHtml
+                |> Query.findAll [ tag "img" ]
+                |> Query.count (Expect.equal 0)
+
+
+thumbnailRendered : String -> Query.Single msg -> Expectation
+thumbnailRendered url query =
+    query
+        |> Query.findAll [ tag "img", attribute (Attr.src (urlPrefix ++ url)) ]
+        |> Query.count (Expect.atLeast 1)
