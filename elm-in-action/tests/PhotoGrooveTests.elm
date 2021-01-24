@@ -5,6 +5,7 @@ module PhotoGrooveTests exposing
     , noPhotosNoThumbnails
     , slidHueSetsHue
     , sliders
+    , thumbnailsWork
     )
 
 import Expect
@@ -45,8 +46,10 @@ import Test
         , describe
         , fuzz
         , fuzz2
+        , fuzz3
         , test
         )
+import Test.Html.Event as Event
 import Test.Html.Query as Query
 import Test.Html.Selector
     exposing
@@ -148,12 +151,10 @@ photoFromUrl url =
 
 thumbnailsWork : Test
 thumbnailsWork =
-    fuzz (Fuzz.intRange 1 5) "URLs render as thumbnails" <|
-        \urlCount ->
+    fuzz urlFuzzer "URLs render as thumbnails" <|
+        \urls ->
             let
-                urls =
-                    List.range 1 urlCount |> List.map (\num -> String.fromInt num ++ ".png")
-
+                thumbnailChecks : List (Query.Single msg -> Expectation)
                 thumbnailChecks =
                     List.map thumbnailRendered urls
             in
@@ -161,3 +162,39 @@ thumbnailsWork =
                 |> view
                 |> Query.fromHtml
                 |> Expect.all thumbnailChecks
+
+
+urlFuzzer : Fuzzer (List String)
+urlFuzzer =
+    let
+        toPng : Int -> String
+        toPng n =
+            String.fromInt n ++ ".png"
+
+        urlsFromCount : Int -> List String
+        urlsFromCount urlCount =
+            List.range 1 urlCount |> List.map toPng
+    in
+    Fuzz.intRange 1 5 |> Fuzz.map urlsFromCount
+
+
+clickThumbnail : Test
+clickThumbnail =
+    fuzz3 urlFuzzer string urlFuzzer "clicking a thumbnail select it" <|
+        \urlsBefore urlToSelect urlsAfter ->
+            let
+                url =
+                    urlToSelect ++ ".jpeg"
+
+                photos =
+                    (urlsBefore ++ url :: urlsAfter) |> List.map photoFromUrl
+
+                srcToClick =
+                    urlPrefix ++ url
+            in
+            { initialModel | status = Loaded photos "" }
+                |> view
+                |> Query.fromHtml
+                |> Query.find [ tag "img", attribute (Attr.src srcToClick) ]
+                |> Event.simulate Event.click
+                |> Event.expect (ClickedPhoto url)
