@@ -130,6 +130,7 @@ modelDecoder =
 type Msg
     = ClickedPhoto String
     | GotInitialModel (Result Http.Error Model)
+    | ClickedFolder FolderPath
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -143,6 +144,9 @@ update msg model =
 
         GotInitialModel (Err _) ->
             ( model, Cmd.none )
+
+        ClickedFolder path ->
+            ( { model | root = toggleExpanded path model.root }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -164,7 +168,7 @@ view model =
     div [ class "content" ]
         [ div [ class "folders" ]
             [ h1 [] [ text "Folders" ]
-            , viewFolder model.root
+            , viewFolder End model.root
             ]
         , div [ class "selected-photo" ] [ selectedPhoto ]
         ]
@@ -210,16 +214,37 @@ viewRelatedPhoto url =
         []
 
 
-viewFolder : Folder -> Html Msg
-viewFolder (Folder folder) =
+viewFolder : FolderPath -> Folder -> Html Msg
+viewFolder path (Folder folder) =
     let
-        subfolders =
-            List.map viewFolder folder.subfolders
+        viewSubfolder index subfolder =
+            viewFolder (appendIndex index path) subfolder
+
+        folderLabel =
+            label [ onClick (ClickedFolder path) ] [ text folder.name ]
     in
-    div [ class "folder" ]
-        [ label [] [ text folder.name ]
-        , div [ class "subfolders" ] subfolders
-        ]
+    if folder.expanded then
+        let
+            contents =
+                List.indexedMap viewSubfolder folder.subfolders
+        in
+        div [ class "folder expanded" ]
+            [ folderLabel
+            , div [ class "contents" ] contents
+            ]
+
+    else
+        div [ class "folder collapsed" ] [ folderLabel ]
+
+
+appendIndex : Int -> FolderPath -> FolderPath
+appendIndex index path =
+    case path of
+        End ->
+            Subfolder index End
+
+        Subfolder subfolderIndex remainingPath ->
+            Subfolder subfolderIndex (appendIndex index remainingPath)
 
 
 urlPrefix : String
