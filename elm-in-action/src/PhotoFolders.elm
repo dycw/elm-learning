@@ -11,7 +11,12 @@ import Json.Decode.Pipeline exposing (required)
 
 
 type Folder
-    = Folder { name : String, photoUrls : List String, subfolders : List Folder }
+    = Folder
+        { name : String
+        , photoUrls : List String
+        , subfolders : List Folder
+        , expanded : Bool
+        }
 
 
 type alias Model =
@@ -25,7 +30,13 @@ initialModel : Model
 initialModel =
     { selectedPhotoUrl = Nothing
     , photos = Dict.empty
-    , root = Folder { name = "Loading...", photoUrls = [], subfolders = [] }
+    , root =
+        Folder
+            { name = "Loading..."
+            , photoUrls = []
+            , subfolders = []
+            , expanded = True
+            }
     }
 
 
@@ -80,13 +91,16 @@ modelDecoder =
                                 { name = "outdoors"
                                 , photoUrls = []
                                 , subfolders = []
+                                , expanded = True
                                 }
                             , Folder
                                 { name = "indoors"
                                 , photoUrls = [ "fresco" ]
                                 , subfolders = []
+                                , expanded = True
                                 }
                             ]
+                        , expanded = True
                         }
                     , Folder
                         { name = "2017"
@@ -96,15 +110,19 @@ modelDecoder =
                                 { name = "outdoors"
                                 , photoUrls = []
                                 , subfolders = []
+                                , expanded = True
                                 }
                             , Folder
                                 { name = "indoors"
                                 , photoUrls = []
                                 , subfolders = []
+                                , expanded = True
                                 }
                             ]
+                        , expanded = True
                         }
                     ]
+                , expanded = True
                 }
         }
 
