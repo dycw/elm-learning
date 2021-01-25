@@ -10,9 +10,14 @@ import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 
 
+type Folder
+    = Folder { name : String, photoUrls : List String, subfolders : List Folder }
+
+
 type alias Model =
     { selectedPhotoUrl : Maybe String
     , photos : Dict String Photo
+    , root : Folder
     }
 
 
@@ -20,6 +25,7 @@ initialModel : Model
 initialModel =
     { selectedPhotoUrl = Nothing
     , photos = Dict.empty
+    , root = Folder { name = "Loading...", photoUrls = [], subfolders = [] }
     }
 
 
@@ -61,6 +67,45 @@ modelDecoder =
                     }
                   )
                 ]
+        , root =
+            Folder
+                { name = "Photos"
+                , photoUrls = []
+                , subfolders =
+                    [ Folder
+                        { name = "2016"
+                        , photoUrls = [ "trevi", "coli" ]
+                        , subfolders =
+                            [ Folder
+                                { name = "outdoors"
+                                , photoUrls = []
+                                , subfolders = []
+                                }
+                            , Folder
+                                { name = "indoors"
+                                , photoUrls = [ "fresco" ]
+                                , subfolders = []
+                                }
+                            ]
+                        }
+                    , Folder
+                        { name = "2017"
+                        , photoUrls = []
+                        , subfolders =
+                            [ Folder
+                                { name = "outdoors"
+                                , photoUrls = []
+                                , subfolders = []
+                                }
+                            , Folder
+                                { name = "indoors"
+                                , photoUrls = []
+                                , subfolders = []
+                                }
+                            ]
+                        }
+                    ]
+                }
         }
 
 
