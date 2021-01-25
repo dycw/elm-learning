@@ -33,7 +33,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( initialModel
     , Http.get
-        { url = "http://elm-in-action/folders/list"
+        { url = "http://elm-in-action.com/folders/list"
         , expect = Http.expectJson GotInitialModel modelDecoder
         }
     )
