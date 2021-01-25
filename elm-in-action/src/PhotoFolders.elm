@@ -2,7 +2,7 @@ module PhotoFolders exposing (main)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, h1, h2, h3, img, span, text)
+import Html exposing (Html, div, h1, h2, h3, img, label, span, sub, text)
 import Html.Attributes exposing (class, src)
 import Html.Events exposing (onClick)
 import Http
@@ -184,6 +184,18 @@ viewRelatedPhoto url =
         , src (urlPrefix ++ "photos/" ++ url ++ "/thumb")
         ]
         []
+
+
+viewFolder : Folder -> Html Msg
+viewFolder (Folder folder) =
+    let
+        subfolders =
+            List.map viewFolder folder.subfolders
+    in
+    div [ class "folder" ]
+        [ label [] [ text folder.name ]
+        , div [ class "subfolders" ] subfolders
+        ]
 
 
 urlPrefix : String
