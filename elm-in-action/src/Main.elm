@@ -3,6 +3,7 @@ module Main exposing (..)
 import Browser exposing (Document)
 import Html exposing (Html, a, caption, h1, li, nav, text, ul)
 import Html.Attributes exposing (classList, href)
+import Html.Events exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
 
 
@@ -45,21 +46,45 @@ viewHeader page =
 
         links : Html Msg
         links =
-            ul []
+            ul
+                []
                 [ navLink Folders { url = "/", caption = "Folders" }
                 , navLink Gallery { url = "/gallery", caption = "Gallery" }
                 ]
 
         navLink : Page -> { url : String, caption : String } -> Html Msg
-        navLink targetPage { url, caption } =
-            li [ classList [ ( "active", page == targetPage ) ] ] [ a [ href url ] [ text caption ] ]
+        navLink route { url, caption } =
+            li
+                [ classList [ ( "active", isActive { link = route, page = Debug.log "Rendering nav link with" page } ) ] ]
+                [ a [ href url ] [ text caption ] ]
     in
-    nav [] [ logo, links ]
+    nav [ onMouseOver NothingYet ] [ logo, links ]
+
+
+isActive : { link : Page, page : Page } -> Bool
+isActive { link, page } =
+    case ( link, page ) of
+        ( Gallery, Gallery ) ->
+            True
+
+        ( Gallery, _ ) ->
+            False
+
+        ( Folders, Folders ) ->
+            True
+
+        -- ( Folders, SelectedPhoto _ ) ->
+        --     True
+        ( Folders, _ ) ->
+            False
+
+        ( NotFound, _ ) ->
+            False
 
 
 viewFooter : Html msg
 viewFooter =
-    text "ok?"
+    text "Just a footer?"
 
 
 type Msg
