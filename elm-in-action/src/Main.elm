@@ -1,23 +1,47 @@
 module Main exposing (..)
 
 import Browser exposing (Document)
-import Html exposing (text)
+import Html exposing (Html, text)
 
 
 type alias Model =
-    {}
+    { page : Page }
+
+
+type Page
+    = Gallery
+    | Folders
+    | NotFound
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {}, Cmd.none )
+    ( { page = Gallery }, Cmd.none )
 
 
 view : Model -> Document Msg
 view model =
+    let
+        content =
+            text "This isn't even my final form!"
+    in
     { title = "Photo Groove, SPA Style"
-    , body = [ text "This isn't even my final form!" ]
+    , body =
+        [ viewHeader model.page
+        , content
+        , viewFooter
+        ]
     }
+
+
+viewHeader : Page -> Html msg
+viewHeader page =
+    text "ok?"
+
+
+viewFooter : Html msg
+viewFooter =
+    text "ok?"
 
 
 type Msg
