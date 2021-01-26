@@ -1,10 +1,12 @@
 module Main exposing (..)
 
-import Browser exposing (Document)
+import Browser exposing (Document, UrlRequest)
+import Browser.Navigation as Nav exposing (Key)
 import Html exposing (Html, a, caption, h1, li, nav, text, ul)
 import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
+import Url exposing (Url)
 
 
 type alias Model =
@@ -17,8 +19,8 @@ type Page
     | NotFound
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ _ _ =
     ( { page = Gallery }, Cmd.none )
 
 
@@ -101,11 +103,23 @@ subscriptions model =
     Sub.none
 
 
+onUrlRequest : UrlRequest -> Msg
+onUrlRequest _ =
+    Debug.todo "handle URL requests"
+
+
+onUrlChange : Url -> Msg
+onUrlChange _ =
+    Debug.todo "handle URL changes"
+
+
 main : Program () Model Msg
 main =
-    Browser.document
+    Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlRequest = onUrlRequest
+        , onUrlChange = onUrlChange
         }
