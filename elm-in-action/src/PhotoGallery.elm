@@ -1,62 +1,12 @@
-port module PhotoGroove exposing
-    ( Model
-    , Msg(..)
-    , Photo
-    , Status(..)
-    , initialModel
-    , main
-    , photoDecoder
-    , update
-    , urlPrefix
-    , view
-    )
+port module PhotoGallery exposing (Model, Msg, init, subscriptions, update, view)
 
 import Browser
-import Html
-    exposing
-        ( Attribute
-        , Html
-        , button
-        , canvas
-        , div
-        , h1
-        , h3
-        , img
-        , input
-        , label
-        , node
-        , text
-        )
-import Html.Attributes as Attr
-    exposing
-        ( class
-        , classList
-        , id
-        , name
-        , src
-        , title
-        , type_
-        )
-import Html.Events
-    exposing
-        ( on
-        , onClick
-        )
+import Html exposing (Attribute, Html, button, canvas, div, h1, h3, img, input, label, node, sub, text)
+import Html.Attributes as Attr exposing (class, classList, id, name, src, title, type_)
+import Html.Events exposing (on, onClick)
 import Http
-import Json.Decode
-    exposing
-        ( Decoder
-        , at
-        , int
-        , list
-        , string
-        , succeed
-        )
-import Json.Decode.Pipeline
-    exposing
-        ( optional
-        , required
-        )
+import Json.Decode exposing (Decoder, at, int, list, string, succeed)
+import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encode
 import Random
 
