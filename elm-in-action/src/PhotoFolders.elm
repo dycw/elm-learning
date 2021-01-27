@@ -1,9 +1,9 @@
-module PhotoFolders exposing (main)
+module PhotoFolders exposing (Model, Msg, init, update, view)
 
 import Browser
 import Dict exposing (Dict)
-import Html exposing (Html, div, h1, h2, h3, img, label, span, sub, text)
-import Html.Attributes exposing (class, src)
+import Html exposing (Html, a, div, h1, h2, h3, img, label, span, sub, text)
+import Html.Attributes exposing (class, href, src)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode exposing (Decoder, int, list, string)
@@ -40,9 +40,9 @@ initialModel =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( initialModel
+init : Maybe String -> ( Model, Cmd Msg )
+init selectedFilename =
+    ( { initialModel | selectedPhotoUrl = selectedFilename }
     , Http.get
         { url = "http://elm-in-action.com/folders/list"
         , expect = Http.expectJson GotInitialModel modelDecoder
@@ -63,7 +63,7 @@ update msg model =
             ( { model | selectedPhotoUrl = Just url }, Cmd.none )
 
         GotInitialModel (Ok newModel) ->
-            ( newModel, Cmd.none )
+            ( { newModel | selectedPhotoUrl = model.selectedPhotoUrl }, Cmd.none )
 
         GotInitialModel (Err _) ->
             ( model, Cmd.none )
@@ -97,16 +97,6 @@ view model =
         ]
 
 
-main : Program () Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = \_ -> Sub.none
-        }
-
-
 type alias Photo =
     { title : String
     , size : Int
@@ -117,8 +107,9 @@ type alias Photo =
 
 viewPhoto : String -> Html Msg
 viewPhoto url =
-    div
-        [ class "photo"
+    a
+        [ href "/photos/++url"
+        , class "photo"
         , onClick (ClickedPhoto url)
         ]
         [ text url ]

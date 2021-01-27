@@ -25,7 +25,7 @@ import Json.Decode as Decode
         ( decodeValue
         )
 import Json.Encode as Encode
-import PhotoGroove
+import PhotoGallery
     exposing
         ( Model
         , Msg(..)
@@ -73,7 +73,7 @@ decoderTest2 =
             , ( "size", Encode.int 5 )
             ]
                 |> Encode.object
-                |> decodeValue PhotoGroove.photoDecoder
+                |> decodeValue PhotoGallery.photoDecoder
                 |> Result.map .title
                 |> Expect.equal (Ok "(untitled)")
 
@@ -86,7 +86,7 @@ decoderTest3 =
             , ( "size", Encode.int size )
             ]
                 |> Encode.object
-                |> decodeValue PhotoGroove.photoDecoder
+                |> decodeValue PhotoGallery.photoDecoder
                 |> Result.map .title
                 |> Expect.equal (Ok "(untitled)")
 
@@ -127,7 +127,7 @@ noPhotosNoThumbnails =
     test "No thumbnails render when there are no photos to render." <|
         \_ ->
             initialModel
-                |> PhotoGroove.view
+                |> PhotoGallery.view
                 |> Query.fromHtml
                 |> Query.findAll [ tag "img" ]
                 |> Query.count (Expect.equal 0)
