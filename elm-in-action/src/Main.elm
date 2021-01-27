@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav exposing (Key)
-import Html exposing (Html, a, caption, h1, li, nav, text, ul)
+import Html exposing (Html, a, caption, h1, hr, li, nav, text, ul)
 import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
@@ -11,7 +11,7 @@ import Url.Parser as Parser exposing ((</>), Parser, s, string)
 
 
 type alias Model =
-    { page : Page }
+    { page : Page, key : Nav.Key }
 
 
 type Page
@@ -23,7 +23,7 @@ type Page
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( { page = urlToPage url }, Cmd.none )
+    ( { page = urlToPage url, key = key }, Cmd.none )
 
 
 urlToPage : Url -> Page
@@ -76,7 +76,7 @@ viewHeader page =
                 [ classList [ ( "active", isActive { link = route, page = Debug.log "Rendering nav link with" page } ) ] ]
                 [ a [ href url ] [ text caption ] ]
     in
-    nav [ onMouseOver NothingYet ] [ logo, links ]
+    nav [] [ logo, links ]
 
 
 isActive : { link : Page, page : Page } -> Bool
@@ -110,12 +110,23 @@ viewFooter =
 
 
 type Msg
-    = NothingYet
+    = ClickedLink UrlRequest
+    | ChangedUrl Url
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        ClickedLink urlRequest ->
+            case urlRequest of
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+        ChangedUrl url ->
+            ( { model | page = urlToPage url }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -140,6 +151,6 @@ main =
         , view = view
         , update = update
         , subscriptions = subscriptions
-        , onUrlRequest = onUrlRequest
-        , onUrlChange = onUrlChange
+        , onUrlRequest = ClickedLink
+        , onUrlChange = ChangedUrl
         }
