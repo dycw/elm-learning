@@ -7,6 +7,7 @@ import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onMouseOver)
 import Html.Lazy exposing (lazy)
 import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>), Parser, s, string)
 
 
 type alias Model =
@@ -14,14 +15,29 @@ type alias Model =
 
 
 type Page
-    = Gallery
+    = SelectedPhoto String
+    | Gallery
     | Folders
     | NotFound
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ _ _ =
-    ( { page = Gallery }, Cmd.none )
+init flags url key =
+    ( { page = urlToPage url }, Cmd.none )
+
+
+urlToPage : Url -> Page
+urlToPage url =
+    Parser.parse parser url |> Maybe.withDefault NotFound
+
+
+parser : Parser (Page -> a) a
+parser =
+    Parser.oneOf
+        [ Parser.map Folders Parser.top
+        , Parser.map Gallery (s "gallery")
+        , Parser.map SelectedPhoto (s "photo" </> Parser.string)
+        ]
 
 
 view : Model -> Document Msg
@@ -75,9 +91,13 @@ isActive { link, page } =
         ( Folders, Folders ) ->
             True
 
-        -- ( Folders, SelectedPhoto _ ) ->
-        --     True
+        ( Folders, SelectedPhoto _ ) ->
+            True
+
         ( Folders, _ ) ->
+            False
+
+        ( SelectedPhoto _, _ ) ->
             False
 
         ( NotFound, _ ) ->
