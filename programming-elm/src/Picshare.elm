@@ -2,8 +2,8 @@ module Picshare exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, form, h1, h2, i, img, input, li, strong, text, ul)
-import Html.Attributes exposing (class, placeholder, src, type_)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (class, disabled, placeholder, src, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 
 
 main : Program () Model Msg
@@ -77,6 +77,8 @@ view model =
 
 type Msg
     = ToggleLike
+    | UpdateComment String
+    | SaveComment
 
 
 update : Msg -> Model -> Model
@@ -84,6 +86,12 @@ update msg model =
     case msg of
         ToggleLike ->
             { model | liked = not model.liked }
+
+        UpdateComment comment ->
+            { model | newComment = comment }
+
+        SaveComment ->
+            saveNewComment model
 
 
 viewComment : String -> Html Msg
@@ -105,12 +113,34 @@ viewComments : Model -> Html Msg
 viewComments model =
     div []
         [ viewCommentList model.comments
-        , form [ class "new-comment" ]
+        , form
+            [ class "new-comment"
+            , onSubmit SaveComment
+            ]
             [ input
                 [ type_ "text"
                 , placeholder "Add a comment..."
+                , value model.newComment
+                , onInput UpdateComment
                 ]
                 []
-            , button [] [ text "Save" ]
+            , button [ disabled (String.isEmpty model.newComment) ] [ text "Save" ]
             ]
         ]
+
+
+saveNewComment : Model -> Model
+saveNewComment model =
+    let
+        comment =
+            String.trim model.newComment
+    in
+    case comment of
+        "" ->
+            model
+
+        _ ->
+            { model
+                | comments = model.comments ++ [ comment ]
+                , newComment = ""
+            }
