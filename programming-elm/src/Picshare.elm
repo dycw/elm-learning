@@ -9,7 +9,7 @@ import Json.Decode exposing (Decoder, bool, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, required)
 
 
-main : Program () Photo Msg
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
@@ -71,7 +71,7 @@ type alias Id =
 
 
 type alias Model =
-    Photo
+    { photo : Maybe Photo }
 
 
 baseUrl : String
@@ -79,22 +79,25 @@ baseUrl =
     "https://programming-elm.com/"
 
 
-initialModel : Photo
+initialModel : Model
 initialModel =
-    { id = 1
-    , url = baseUrl ++ "1.jpg"
-    , caption = "Surfing"
-    , liked = False
-    , comments = [ "Cowabunga, dude!" ]
-    , newComment = ""
+    { photo =
+        Just
+            { id = 1
+            , url = baseUrl ++ "1.jpg"
+            , caption = "Surfing"
+            , liked = False
+            , comments = [ "Cowabunga, dude!" ]
+            , newComment = ""
+            }
     }
 
 
-view : Photo -> Html Msg
+view : Model -> Html Msg
 view model =
     div []
         [ div [ class "header" ] [ h1 [] [ text "Picshare" ] ]
-        , div [ class "content-flow" ] [ viewDetailedPhoto model ]
+        , div [ class "content-flow" ] [ viewFeed model.photo ]
         ]
 
 
@@ -109,22 +112,37 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ToggleLike ->
-            ( { model | liked = not model.liked }
+            ( { model | photo = updateFeed toggleLike model.photo }
             , Cmd.none
             )
 
         UpdateComment comment ->
-            ( { model | newComment = comment }
+            ( { model | photo = updateFeed (updateComment comment) model.photo }
             , Cmd.none
             )
 
         SaveComment ->
-            ( saveNewComment model
+            ( { model | photo = updateFeed saveNewComment model.photo }
             , Cmd.none
             )
 
         LoadFeed _ ->
             ( model, Cmd.none )
+
+
+toggleLike : Photo -> Photo
+toggleLike photo =
+    { photo | liked = not photo.liked }
+
+
+updateComment : String -> Photo -> Photo
+updateComment comment photo =
+    { photo | newComment = comment }
+
+
+updateFeed : (Photo -> Photo) -> Maybe Photo -> Maybe Photo
+updateFeed updatePhoto maybePhoto =
+    Maybe.map updatePhoto maybePhoto
 
 
 viewComment : String -> Html Msg
@@ -201,3 +219,13 @@ fetchFeed =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+viewFeed : Maybe Photo -> Html Msg
+viewFeed maybePhoto =
+    case maybePhoto of
+        Just photo ->
+            viewDetailedPhoto photo
+
+        Nothing ->
+            text ""
