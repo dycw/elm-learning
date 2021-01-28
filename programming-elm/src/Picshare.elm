@@ -1,8 +1,8 @@
 module Picshare exposing (main)
 
 import Browser
-import Html exposing (Html, div, h1, h2, i, img, text)
-import Html.Attributes exposing (class, src)
+import Html exposing (Html, button, div, form, h1, h2, i, img, input, li, strong, text, ul)
+import Html.Attributes exposing (class, placeholder, src, type_)
 import Html.Events exposing (onClick)
 
 
@@ -18,6 +18,7 @@ viewDetailedPhoto model =
         , div [ class "photo-info" ]
             [ viewLoveButton model
             , h2 [ class "caption" ] [ text model.caption ]
+            , viewComments model
             ]
         ]
 
@@ -46,6 +47,8 @@ type alias Model =
     { url : String
     , caption : String
     , liked : Bool
+    , comments : List String
+    , newComment : String
     }
 
 
@@ -59,6 +62,8 @@ initialModel =
     { url = baseUrl ++ "1.jpg"
     , caption = "Surfing"
     , liked = False
+    , comments = [ "Cowabunga, dude!" ]
+    , newComment = ""
     }
 
 
@@ -79,3 +84,33 @@ update msg model =
     case msg of
         ToggleLike ->
             { model | liked = not model.liked }
+
+
+viewComment : String -> Html Msg
+viewComment comment =
+    li [] [ strong [] [ text "Comment:" ], text (" " ++ comment) ]
+
+
+viewCommentList : List String -> Html Msg
+viewCommentList comments =
+    case comments of
+        [] ->
+            text ""
+
+        _ ->
+            div [ class "comments" ] [ ul [] (List.map viewComment comments) ]
+
+
+viewComments : Model -> Html Msg
+viewComments model =
+    div []
+        [ viewCommentList model.comments
+        , form [ class "new-comment" ]
+            [ input
+                [ type_ "text"
+                , placeholder "Add a comment..."
+                ]
+                []
+            , button [] [ text "Save" ]
+            ]
+        ]
