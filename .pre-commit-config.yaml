@@ -3,9 +3,10 @@ repos:
     rev: 0.0.49
     hooks:
       - id: elm
+        exclude: official-download
       - id: markdown
       - id: no-binary
-        exclude: waterfall.jpg
+        exclude: (waterfall.jpg|official-download)
       - id: no-commit
       - id: notebook
       - id: prettier
