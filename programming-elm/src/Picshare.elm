@@ -6,14 +6,7 @@ import Html.Attributes exposing (class, src)
 
 main : Html msg
 main =
-    div []
-        [ div [ class "header" ] [ h1 [] [ text "Picshare" ] ]
-        , div [ class "content-flow" ]
-            [ viewDetailedPhoto { url = baseUrl ++ "1.jpg", caption = "Surfing" }
-            , viewDetailedPhoto { url = baseUrl ++ "2.jpg", caption = "The Fox" }
-            , viewDetailedPhoto { url = baseUrl ++ "3.jpg", caption = "Evening" }
-            ]
-        ]
+    view initialModel
 
 
 viewDetailedPhoto : { url : String, caption : String } -> Html msg
