@@ -4,14 +4,27 @@ import Browser
 import Html exposing (Html, button, div, form, h1, h2, i, img, input, li, strong, text, ul)
 import Html.Attributes exposing (class, disabled, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
+import Json.Decode exposing (Decoder, bool, int, list, string, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, required)
 
 
-main : Program () Model Msg
+main : Program () Photo Msg
 main =
-    Browser.sandbox { init = initialModel, view = view, update = update }
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
-viewDetailedPhoto : Model -> Html Msg
+init : () -> ( Model, Cmd Msg )
+init () =
+    ( initialModel, fetchFeed )
+
+
+viewDetailedPhoto : Photo -> Html Msg
 viewDetailedPhoto model =
     div [ class "detailed-photo" ]
         [ img [ src model.url ] []
@@ -23,7 +36,7 @@ viewDetailedPhoto model =
         ]
 
 
-viewLoveButton : Model -> Html Msg
+viewLoveButton : Photo -> Html Msg
 viewLoveButton model =
     let
         buttonClass =
@@ -43,8 +56,9 @@ viewLoveButton model =
         ]
 
 
-type alias Model =
-    { url : String
+type alias Photo =
+    { id : Id
+    , url : String
     , caption : String
     , liked : Bool
     , comments : List String
@@ -52,14 +66,23 @@ type alias Model =
     }
 
 
+type alias Id =
+    Int
+
+
+type alias Model =
+    Photo
+
+
 baseUrl : String
 baseUrl =
     "https://programming-elm.com/"
 
 
-initialModel : Model
+initialModel : Photo
 initialModel =
-    { url = baseUrl ++ "1.jpg"
+    { id = 1
+    , url = baseUrl ++ "1.jpg"
     , caption = "Surfing"
     , liked = False
     , comments = [ "Cowabunga, dude!" ]
@@ -67,7 +90,7 @@ initialModel =
     }
 
 
-view : Model -> Html Msg
+view : Photo -> Html Msg
 view model =
     div []
         [ div [ class "header" ] [ h1 [] [ text "Picshare" ] ]
@@ -79,19 +102,29 @@ type Msg
     = ToggleLike
     | UpdateComment String
     | SaveComment
+    | LoadFeed (Result Http.Error Photo)
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ToggleLike ->
-            { model | liked = not model.liked }
+            ( { model | liked = not model.liked }
+            , Cmd.none
+            )
 
         UpdateComment comment ->
-            { model | newComment = comment }
+            ( { model | newComment = comment }
+            , Cmd.none
+            )
 
         SaveComment ->
-            saveNewComment model
+            ( saveNewComment model
+            , Cmd.none
+            )
+
+        LoadFeed _ ->
+            ( model, Cmd.none )
 
 
 viewComment : String -> Html Msg
@@ -109,7 +142,7 @@ viewCommentList comments =
             div [ class "comments" ] [ ul [] (List.map viewComment comments) ]
 
 
-viewComments : Model -> Html Msg
+viewComments : Photo -> Html Msg
 viewComments model =
     div []
         [ viewCommentList model.comments
@@ -129,7 +162,7 @@ viewComments model =
         ]
 
 
-saveNewComment : Model -> Model
+saveNewComment : Photo -> Photo
 saveNewComment model =
     let
         comment =
@@ -144,3 +177,27 @@ saveNewComment model =
                 | comments = model.comments ++ [ comment ]
                 , newComment = ""
             }
+
+
+photoDecoder : Decoder Photo
+photoDecoder =
+    succeed Photo
+        |> required "id" int
+        |> required "url" string
+        |> required "caption" string
+        |> required "liked" bool
+        |> required "comments" (list string)
+        |> hardcoded ""
+
+
+fetchFeed : Cmd Msg
+fetchFeed =
+    Http.get
+        { url = baseUrl ++ "feed/1"
+        , expect = Http.expectJson LoadFeed photoDecoder
+        }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
