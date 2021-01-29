@@ -37,10 +37,10 @@ viewDetailedPhoto model =
 
 
 viewLoveButton : Photo -> Html Msg
-viewLoveButton model =
+viewLoveButton photo =
     let
         buttonClass =
-            if model.liked then
+            if photo.liked then
                 "fa-heart"
 
             else
@@ -50,8 +50,7 @@ viewLoveButton model =
         [ i
             [ class "fa fa-2x"
             , class buttonClass
-
-            -- , onClick ToggleLike
+            , onClick (ToggleLike photo.id)
             ]
             []
         ]
@@ -98,9 +97,9 @@ view model =
 
 
 type Msg
-    = ToggleLike
-    | UpdateComment String
-    | SaveComment
+    = ToggleLike Id
+    | UpdateComment Id String
+    | SaveComment Id
     | LoadFeed (Result Http.Error Feed)
 
 
@@ -142,9 +141,9 @@ updateComment comment photo =
     { photo | newComment = comment }
 
 
-updateFeed : (Photo -> Photo) -> Maybe Photo -> Maybe Photo
-updateFeed updatePhoto maybePhoto =
-    Maybe.map updatePhoto maybePhoto
+updateFeed : (Photo -> Photo) -> Id -> Maybe Feed -> Maybe Feed
+updateFeed updatePhoto id maybeFeed =
+    Maybe.map (updatePhotoById updatePhoto id) maybeFeed
 
 
 viewComment : String -> Html Msg
@@ -163,23 +162,21 @@ viewCommentList comments =
 
 
 viewComments : Photo -> Html Msg
-viewComments model =
+viewComments photo =
     div []
-        [ viewCommentList model.comments
+        [ viewCommentList photo.comments
         , form
             [ class "new-comment"
-
-            -- , onSubmit SaveComment
+            , onSubmit (SaveComment photo.id)
             ]
             [ input
                 [ type_ "text"
                 , placeholder "Add a comment..."
-                , value model.newComment
-
-                -- , onInput UpdateComment
+                , value photo.newComment
+                , onInput (UpdateComment photo.id)
                 ]
                 []
-            , button [ disabled (String.isEmpty model.newComment) ] [ text "Save" ]
+            , button [ disabled (String.isEmpty photo.newComment) ] [ text "Save" ]
             ]
         ]
 
@@ -233,3 +230,16 @@ viewFeed maybeFeed =
 
         Nothing ->
             div [ class "loading-feed" ] [ text "Loading Feed..." ]
+
+
+updatePhotoById : (Photo -> Photo) -> Id -> Feed -> Feed
+updatePhotoById updatePhoto id feed =
+    List.map
+        (\photo ->
+            if photo.id == id then
+                updatePhoto photo
+
+            else
+                photo
+        )
+        feed
