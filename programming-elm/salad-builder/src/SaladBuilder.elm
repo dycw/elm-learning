@@ -262,6 +262,19 @@ viewSection heading children =
     section [ class "salad-section" ] (h2 [] [ text heading ] :: children)
 
 
+viewToppingOption : String -> Topping -> Set String -> Html Msg
+viewToppingOption toppingLabel topping toppings =
+    label [ class "select-option" ]
+        [ input
+            [ type_ "checkbox"
+            , checked (Set.member (toppingToString topping) toppings)
+            , onCheck (SaladMsg << ToggleTopping topping)
+            ]
+            []
+        , text toppingLabel
+        ]
+
+
 viewBuild : Model -> Html Msg
 viewBuild model =
     div []
@@ -299,33 +312,9 @@ viewBuild model =
                 ]
             ]
         , viewSection "2. Select Toppings"
-            [ label [ class "select-option" ]
-                [ input
-                    [ type_ "checkbox"
-                    , checked (Set.member (toppingToString Tomatoes) model.salad.toppings)
-                    , onCheck (SaladMsg << ToggleTopping Tomatoes)
-                    ]
-                    []
-                , text "Tomatoes"
-                ]
-            , label [ class "select-option" ]
-                [ input
-                    [ type_ "checkbox"
-                    , checked (Set.member (toppingToString Cucumbers) model.salad.toppings)
-                    , onCheck (SaladMsg << ToggleTopping Cucumbers)
-                    ]
-                    []
-                , text "Cucumbers"
-                ]
-            , label [ class "select-option" ]
-                [ input
-                    [ type_ "checkbox"
-                    , checked (Set.member (toppingToString Onions) model.salad.toppings)
-                    , onCheck (SaladMsg << ToggleTopping Onions)
-                    ]
-                    []
-                , text "Onions"
-                ]
+            [ viewToppingOption "Tomatoes" Tomatoes model.salad.toppings
+            , viewToppingOption "Cucumbers" Cucumbers model.salad.toppings
+            , viewToppingOption "Onions" Onions model.salad.toppings
             ]
         , viewSection "3. Select Dressing"
             [ label [ class "select-option" ]
