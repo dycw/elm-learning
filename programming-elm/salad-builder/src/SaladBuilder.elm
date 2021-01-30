@@ -285,7 +285,7 @@ viewBuild model =
                 [ input
                     [ type_ "checkbox"
                     , checked (Set.member (toppingToString Tomatoes) model.toppings)
-                    , onCheck ToggleTomatoes
+                    , onCheck (ToggleTopping Tomatoes)
                     ]
                     []
                 , text "Tomatoes"
@@ -294,7 +294,7 @@ viewBuild model =
                 [ input
                     [ type_ "checkbox"
                     , checked (Set.member (toppingToString Cucumbers) model.toppings)
-                    , onCheck ToggleCucumbers
+                    , onCheck (ToggleTopping Cucumbers)
                     ]
                     []
                 , text "Cucumbers"
@@ -303,7 +303,7 @@ viewBuild model =
                 [ input
                     [ type_ "checkbox"
                     , checked (Set.member (toppingToString Onions) model.toppings)
-                    , onCheck ToggleOnions
+                    , onCheck (ToggleTopping Onions)
                     ]
                     []
                 , text "Onions"
@@ -423,9 +423,7 @@ view model =
 
 type Msg
     = SetBase Base
-    | ToggleTomatoes Bool
-    | ToggleCucumbers Bool
-    | ToggleOnions Bool
+    | ToggleTopping Topping Bool
     | SetDressing Dressing
     | SetName String
     | SetEmail String
@@ -468,38 +466,18 @@ update msg model =
             , Cmd.none
             )
 
-        ToggleTomatoes add ->
-            if add then
-                ( { model | toppings = Set.insert (toppingToString Tomatoes) model.toppings }
-                , Cmd.none
-                )
+        ToggleTopping topping add ->
+            let
+                updater =
+                    if add then
+                        Set.insert
 
-            else
-                ( { model | toppings = Set.remove (toppingToString Tomatoes) model.toppings }
-                , Cmd.none
-                )
-
-        ToggleCucumbers add ->
-            if add then
-                ( { model | toppings = Set.insert (toppingToString Cucumbers) model.toppings }
-                , Cmd.none
-                )
-
-            else
-                ( { model | toppings = Set.remove (toppingToString Cucumbers) model.toppings }
-                , Cmd.none
-                )
-
-        ToggleOnions add ->
-            if add then
-                ( { model | toppings = Set.insert (toppingToString Onions) model.toppings }
-                , Cmd.none
-                )
-
-            else
-                ( { model | toppings = Set.remove (toppingToString Onions) model.toppings }
-                , Cmd.none
-                )
+                    else
+                        Set.remove
+            in
+            ( { model | toppings = updater (toppingToString topping) model.toppings }
+            , Cmd.none
+            )
 
         SetDressing dressing ->
             ( { model | dressing = dressing }
