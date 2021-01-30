@@ -71,7 +71,9 @@ type alias Id =
 
 
 type alias Model =
-    { feed : Maybe Feed }
+    { feed : Maybe Feed
+    , error : Maybe Http.Error
+    }
 
 
 type alias Feed =
@@ -85,7 +87,9 @@ baseUrl =
 
 initialModel : Model
 initialModel =
-    { feed = Nothing }
+    { feed = Nothing
+    , error = Nothing
+    }
 
 
 view : Model -> Html Msg
