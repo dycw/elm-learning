@@ -1,59 +1,17 @@
 module Picshare exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, form, h1, h2, i, img, input, li, strong, text, ul)
+import Html exposing (..)
 import Html.Attributes exposing (class, disabled, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, bool, int, list, string, succeed)
+import Json.Decode exposing (Decoder, bool, decodeString, int, list, string, succeed)
 import Json.Decode.Pipeline exposing (hardcoded, required)
+import WebSocket
 
 
-main : Program () Model Msg
-main =
-    Browser.element
-        { init = init
-        , view = view
-        , update = update
-        , subscriptions = subscriptions
-        }
-
-
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( initialModel, fetchFeed )
-
-
-viewDetailedPhoto : Photo -> Html Msg
-viewDetailedPhoto model =
-    div [ class "detailed-photo" ]
-        [ img [ src model.url ] []
-        , div [ class "photo-info" ]
-            [ viewLoveButton model
-            , h2 [ class "caption" ] [ text model.caption ]
-            , viewComments model
-            ]
-        ]
-
-
-viewLoveButton : Photo -> Html Msg
-viewLoveButton model =
-    let
-        buttonClass =
-            if model.liked then
-                "fa-heart"
-
-            else
-                "fa-heart-o"
-    in
-    div [ class "like-button" ]
-        [ i
-            [ class "fa fa-2x"
-            , class buttonClass
-            , onClick ToggleLike
-            ]
-            []
-        ]
+type alias Id =
+    Int
 
 
 type alias Photo =
@@ -66,129 +24,15 @@ type alias Photo =
     }
 
 
-type alias Id =
-    Int
+type alias Feed =
+    List Photo
 
 
 type alias Model =
-    { photo : Maybe Photo }
-
-
-baseUrl : String
-baseUrl =
-    "https://programming-elm.com/"
-
-
-initialModel : Model
-initialModel =
-    { photo = Nothing }
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ div [ class "header" ] [ h1 [] [ text "Picshare" ] ]
-        , div [ class "content-flow" ] [ viewFeed model.photo ]
-        ]
-
-
-type Msg
-    = ToggleLike
-    | UpdateComment String
-    | SaveComment
-    | LoadFeed (Result Http.Error Photo)
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        ToggleLike ->
-            ( { model | photo = updateFeed toggleLike model.photo }
-            , Cmd.none
-            )
-
-        UpdateComment comment ->
-            ( { model | photo = updateFeed (updateComment comment) model.photo }
-            , Cmd.none
-            )
-
-        SaveComment ->
-            ( { model | photo = updateFeed saveNewComment model.photo }
-            , Cmd.none
-            )
-
-        LoadFeed (Ok photo) ->
-            ( { model | photo = Just photo }, Cmd.none )
-
-        LoadFeed (Err _) ->
-            ( model, Cmd.none )
-
-
-toggleLike : Photo -> Photo
-toggleLike photo =
-    { photo | liked = not photo.liked }
-
-
-updateComment : String -> Photo -> Photo
-updateComment comment photo =
-    { photo | newComment = comment }
-
-
-updateFeed : (Photo -> Photo) -> Maybe Photo -> Maybe Photo
-updateFeed updatePhoto maybePhoto =
-    Maybe.map updatePhoto maybePhoto
-
-
-viewComment : String -> Html Msg
-viewComment comment =
-    li [] [ strong [] [ text "Comment:" ], text (" " ++ comment) ]
-
-
-viewCommentList : List String -> Html Msg
-viewCommentList comments =
-    case comments of
-        [] ->
-            text ""
-
-        _ ->
-            div [ class "comments" ] [ ul [] (List.map viewComment comments) ]
-
-
-viewComments : Photo -> Html Msg
-viewComments model =
-    div []
-        [ viewCommentList model.comments
-        , form
-            [ class "new-comment"
-            , onSubmit SaveComment
-            ]
-            [ input
-                [ type_ "text"
-                , placeholder "Add a comment..."
-                , value model.newComment
-                , onInput UpdateComment
-                ]
-                []
-            , button [ disabled (String.isEmpty model.newComment) ] [ text "Save" ]
-            ]
-        ]
-
-
-saveNewComment : Photo -> Photo
-saveNewComment model =
-    let
-        comment =
-            String.trim model.newComment
-    in
-    case comment of
-        "" ->
-            model
-
-        _ ->
-            { model
-                | comments = model.comments ++ [ comment ]
-                , newComment = ""
-            }
+    { feed : Maybe Feed
+    , error : Maybe Http.Error
+    , streamQueue : Feed
+    }
 
 
 photoDecoder : Decoder Photo
@@ -202,24 +46,282 @@ photoDecoder =
         |> hardcoded ""
 
 
+baseUrl : String
+baseUrl =
+    "https://programming-elm.com/"
+
+
+wsUrl : String
+wsUrl =
+    "wss://programming-elm.com/"
+
+
+initialModel : Model
+initialModel =
+    { feed = Nothing
+    , error = Nothing
+    , streamQueue = []
+    }
+
+
+init : () -> ( Model, Cmd Msg )
+init () =
+    ( initialModel, fetchFeed )
+
+
 fetchFeed : Cmd Msg
 fetchFeed =
     Http.get
-        { url = baseUrl ++ "feed/1"
-        , expect = Http.expectJson LoadFeed photoDecoder
+        { url = baseUrl ++ "feed"
+        , expect = Http.expectJson LoadFeed (list photoDecoder)
         }
+
+
+viewLoveButton : Photo -> Html Msg
+viewLoveButton photo =
+    let
+        buttonClass =
+            if photo.liked then
+                "fa-heart"
+
+            else
+                "fa-heart-o"
+    in
+    div [ class "like-button" ]
+        [ i
+            [ class "fa fa-2x"
+            , class buttonClass
+            , onClick (ToggleLike photo.id)
+            ]
+            []
+        ]
+
+
+viewComment : String -> Html Msg
+viewComment comment =
+    li []
+        [ strong [] [ text "Comment:" ]
+        , text (" " ++ comment)
+        ]
+
+
+viewCommentList : List String -> Html Msg
+viewCommentList comments =
+    case comments of
+        [] ->
+            text ""
+
+        _ ->
+            div [ class "comments" ]
+                [ ul []
+                    (List.map viewComment comments)
+                ]
+
+
+viewComments : Photo -> Html Msg
+viewComments photo =
+    div []
+        [ viewCommentList photo.comments
+        , form [ class "new-comment", onSubmit (SaveComment photo.id) ]
+            [ input
+                [ type_ "text"
+                , placeholder "Add a comment..."
+                , value photo.newComment
+                , onInput (UpdateComment photo.id)
+                ]
+                []
+            , button
+                [ disabled (String.isEmpty photo.newComment) ]
+                [ text "Save" ]
+            ]
+        ]
+
+
+viewDetailedPhoto : Photo -> Html Msg
+viewDetailedPhoto photo =
+    div [ class "detailed-photo" ]
+        [ img [ src photo.url ] []
+        , div [ class "photo-info" ]
+            [ viewLoveButton photo
+            , h2 [ class "caption" ] [ text photo.caption ]
+            , viewComments photo
+            ]
+        ]
+
+
+viewFeed : Maybe Feed -> Html Msg
+viewFeed maybeFeed =
+    case maybeFeed of
+        Just feed ->
+            div [] (List.map viewDetailedPhoto feed)
+
+        Nothing ->
+            div [ class "loading-feed" ]
+                [ text "Loading Feed..." ]
+
+
+errorMessage : Http.Error -> String
+errorMessage error =
+    case error of
+        Http.BadBody _ ->
+            """Sorry, we couldn't process your feed at this time.
+            We're working on it!"""
+
+        _ ->
+            """Sorry, we couldn't load your feed at this time.
+            Please try again later."""
+
+
+viewStreamNotification : Feed -> Html Msg
+viewStreamNotification queue =
+    case queue of
+        [] ->
+            text ""
+
+        _ ->
+            let
+                content =
+                    "View new photos: " ++ String.fromInt (List.length queue)
+            in
+            div
+                [ class "stream-notification"
+                , onClick FlushStreamQueue
+                ]
+                [ text content ]
+
+
+viewContent : Model -> Html Msg
+viewContent model =
+    case model.error of
+        Just error ->
+            div [ class "feed-error" ]
+                [ text (errorMessage error) ]
+
+        Nothing ->
+            div []
+                [ viewStreamNotification model.streamQueue
+                , viewFeed model.feed
+                ]
+
+
+view : Model -> Html Msg
+view model =
+    div []
+        [ div [ class "header" ]
+            [ h1 [] [ text "Picshare" ] ]
+        , div [ class "content-flow" ]
+            [ viewContent model ]
+        ]
+
+
+type Msg
+    = ToggleLike Id
+    | UpdateComment Id String
+    | SaveComment Id
+    | LoadFeed (Result Http.Error Feed)
+    | LoadStreamPhoto (Result Json.Decode.Error Photo)
+    | FlushStreamQueue
+
+
+saveNewComment : Photo -> Photo
+saveNewComment photo =
+    let
+        comment =
+            String.trim photo.newComment
+    in
+    case comment of
+        "" ->
+            photo
+
+        _ ->
+            { photo
+                | comments = photo.comments ++ [ comment ]
+                , newComment = ""
+            }
+
+
+toggleLike : Photo -> Photo
+toggleLike photo =
+    { photo | liked = not photo.liked }
+
+
+updateComment : String -> Photo -> Photo
+updateComment comment photo =
+    { photo | newComment = comment }
+
+
+updatePhotoById : (Photo -> Photo) -> Id -> Feed -> Feed
+updatePhotoById updatePhoto id feed =
+    List.map
+        (\photo ->
+            if photo.id == id then
+                updatePhoto photo
+
+            else
+                photo
+        )
+        feed
+
+
+updateFeed : (Photo -> Photo) -> Id -> Maybe Feed -> Maybe Feed
+updateFeed updatePhoto id maybeFeed =
+    Maybe.map (updatePhotoById updatePhoto id) maybeFeed
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        ToggleLike id ->
+            ( { model
+                | feed = updateFeed toggleLike id model.feed
+              }
+            , Cmd.none
+            )
+
+        UpdateComment id comment ->
+            ( { model
+                | feed = updateFeed (updateComment comment) id model.feed
+              }
+            , Cmd.none
+            )
+
+        SaveComment id ->
+            ( { model
+                | feed = updateFeed saveNewComment id model.feed
+              }
+            , Cmd.none
+            )
+
+        LoadFeed (Ok feed) ->
+            ( { model | feed = Just feed }
+            , WebSocket.listen wsUrl
+            )
+
+        LoadFeed (Err error) ->
+            ( { model | error = Just error }, Cmd.none )
+
+        LoadStreamPhoto (Ok photo) ->
+            ( { model | streamQueue = photo :: model.streamQueue }
+            , Cmd.none
+            )
+
+        LoadStreamPhoto (Err _) ->
+            ( model, Cmd.none )
+
+        FlushStreamQueue ->
+            ( { model | feed = Maybe.map ((++) model.streamQueue) model.feed, streamQueue = [] }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    WebSocket.receive (LoadStreamPhoto << decodeString photoDecoder)
 
 
-viewFeed : Maybe Photo -> Html Msg
-viewFeed maybePhoto =
-    case maybePhoto of
-        Just photo ->
-            viewDetailedPhoto photo
-
-        Nothing ->
-            div [ class "loading-feed" ] [ text "Loading Feed..." ]
+main : Program () Model Msg
+main =
+    Browser.element
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
