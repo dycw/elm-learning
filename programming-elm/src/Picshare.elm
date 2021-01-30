@@ -96,7 +96,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "header" ] [ h1 [] [ text "Picshare" ] ]
-        , div [ class "content-flow" ] [ viewFeed model.feed ]
+        , div [ class "content-flow" ] [ viewContent model ]
         ]
 
 
@@ -128,8 +128,8 @@ update msg model =
         LoadFeed (Ok feed) ->
             ( { model | feed = Just feed }, Cmd.none )
 
-        LoadFeed (Err _) ->
-            ( model, Cmd.none )
+        LoadFeed (Err error) ->
+            ( { model | error = Just error }, Cmd.none )
 
 
 toggleLike : Photo -> Photo
@@ -244,3 +244,25 @@ updatePhotoById updatePhoto id feed =
                 photo
         )
         feed
+
+
+viewContent : Model -> Html Msg
+viewContent model =
+    case model.error of
+        Just error ->
+            div [ class "feed-error" ] [ text (errorMessage error) ]
+
+        Nothing ->
+            viewFeed model.feed
+
+
+errorMessage : Http.Error -> String
+errorMessage error =
+    case error of
+        Http.BadBody _ ->
+            """Sorry, we couldn't process your feed at this time.
+We're working on it!"""
+
+        _ ->
+            """Sorry, we couldn't load your feed at this time.
+Please try again later."""
