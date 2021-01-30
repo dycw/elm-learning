@@ -253,7 +253,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "base"
                     , checked (model.base == Lettuce)
-                    , onClick SelectLettuce
+                    , onClick (SetBase Lettuce)
                     ]
                     []
                 , text "Lettuce"
@@ -263,7 +263,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "base"
                     , checked (model.base == Spinach)
-                    , onClick SelectSpinach
+                    , onClick (SetBase Spinach)
                     ]
                     []
                 , text "Spinach"
@@ -273,7 +273,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "base"
                     , checked (model.base == SpringMix)
-                    , onClick SelectSpringMix
+                    , onClick (SetBase SpringMix)
                     ]
                     []
                 , text "Spring Mix"
@@ -422,9 +422,7 @@ view model =
 
 
 type Msg
-    = SelectLettuce
-    | SelectSpinach
-    | SelectSpringMix
+    = SetBase Base
     | ToggleTomatoes Bool
     | ToggleCucumbers Bool
     | ToggleOnions Bool
@@ -468,18 +466,8 @@ send model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SelectLettuce ->
-            ( { model | base = Lettuce }
-            , Cmd.none
-            )
-
-        SelectSpinach ->
-            ( { model | base = Spinach }
-            , Cmd.none
-            )
-
-        SelectSpringMix ->
-            ( { model | base = SpringMix }
+        SetBase base ->
+            ( { model | base = base }
             , Cmd.none
             )
 
