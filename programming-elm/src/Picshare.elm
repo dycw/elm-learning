@@ -106,28 +106,25 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        {- ToggleLike ->
-               ( { model | photo = updateFeed toggleLike model.photo }
-               , Cmd.none
-               )
+        ToggleLike id ->
+            ( { model | feed = updateFeed toggleLike id model.feed }
+            , Cmd.none
+            )
 
-           UpdateComment comment ->
-               ( { model | photo = updateFeed (updateComment comment) model.photo }
-               , Cmd.none
-               )
+        UpdateComment id comment ->
+            ( { model | feed = updateFeed (updateComment comment) id model.feed }
+            , Cmd.none
+            )
 
-           SaveComment ->
-               ( { model | photo = updateFeed saveNewComment model.photo }
-               , Cmd.none
-               )
-        -}
+        SaveComment id ->
+            ( { model | feed = updateFeed saveNewComment id model.feed }
+            , Cmd.none
+            )
+
         LoadFeed (Ok feed) ->
             ( { model | feed = Just feed }, Cmd.none )
 
         LoadFeed (Err _) ->
-            ( model, Cmd.none )
-
-        _ ->
             ( model, Cmd.none )
 
 
