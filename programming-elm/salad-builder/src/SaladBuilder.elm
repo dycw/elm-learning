@@ -316,7 +316,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "dressing"
                     , checked (model.dressing == NoDressing)
-                    , onClick SelectNoDressing
+                    , onClick (SetDressing NoDressing)
                     ]
                     []
                 , text "None"
@@ -326,7 +326,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "dressing"
                     , checked (model.dressing == Italian)
-                    , onClick SelectItalian
+                    , onClick (SetDressing Italian)
                     ]
                     []
                 , text "Italian"
@@ -336,7 +336,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "dressing"
                     , checked (model.dressing == RaspberryVinaigrette)
-                    , onClick SelectRaspberryVinaigrette
+                    , onClick (SetDressing RaspberryVinaigrette)
                     ]
                     []
                 , text "Raspberry Vinaigrette"
@@ -346,7 +346,7 @@ viewBuild model =
                     [ type_ "radio"
                     , name "dressing"
                     , checked (model.dressing == OilVinegar)
-                    , onClick SelectOilVinegar
+                    , onClick (SetDressing OilVinegar)
                     ]
                     []
                 , text "Oil and Vinegar"
@@ -426,10 +426,7 @@ type Msg
     | ToggleTomatoes Bool
     | ToggleCucumbers Bool
     | ToggleOnions Bool
-    | SelectNoDressing
-    | SelectItalian
-    | SelectRaspberryVinaigrette
-    | SelectOilVinegar
+    | SetDressing Dressing
     | SetName String
     | SetEmail String
     | SetPhone String
@@ -504,23 +501,8 @@ update msg model =
                 , Cmd.none
                 )
 
-        SelectNoDressing ->
-            ( { model | dressing = NoDressing }
-            , Cmd.none
-            )
-
-        SelectItalian ->
-            ( { model | dressing = Italian }
-            , Cmd.none
-            )
-
-        SelectRaspberryVinaigrette ->
-            ( { model | dressing = RaspberryVinaigrette }
-            , Cmd.none
-            )
-
-        SelectOilVinegar ->
-            ( { model | dressing = OilVinegar }
+        SetDressing dressing ->
+            ( { model | dressing = dressing }
             , Cmd.none
             )
 
