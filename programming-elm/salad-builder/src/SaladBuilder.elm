@@ -275,6 +275,15 @@ viewToppingOption toppingLabel topping toppings =
         ]
 
 
+viewSelectToppings : Set String -> Html Msg
+viewSelectToppings toppings =
+    div []
+        [ viewToppingOption "Tomatoes" Tomatoes toppings
+        , viewToppingOption "Cucumbers" Cucumbers toppings
+        , viewToppingOption "Onions" Onions toppings
+        ]
+
+
 viewBuild : Model -> Html Msg
 viewBuild model =
     div []
@@ -311,11 +320,7 @@ viewBuild model =
                 , text "Spring Mix"
                 ]
             ]
-        , viewSection "2. Select Toppings"
-            [ viewToppingOption "Tomatoes" Tomatoes model.salad.toppings
-            , viewToppingOption "Cucumbers" Cucumbers model.salad.toppings
-            , viewToppingOption "Onions" Onions model.salad.toppings
-            ]
+        , viewSection "2. Select Toppings" [ viewSelectToppings model.salad.toppings ]
         , viewSection "3. Select Dressing"
             [ label [ class "select-option" ]
                 [ input
