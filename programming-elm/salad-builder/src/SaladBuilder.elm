@@ -202,15 +202,50 @@ viewError error =
             text ""
 
 
+viewConfirmation : Model -> Html msg
+viewConfirmation model =
+    div [ class "confirmation" ]
+        [ h2 [] [ text "Woo hoo!" ]
+        , p [] [ text "Thanks for your order!" ]
+        , table []
+            [ tr []
+                [ th [] [ text "Base:" ]
+                , td [] [ text (baseToString model.base) ]
+                ]
+            , tr []
+                [ th [] [ text "Toppings:" ]
+                , td []
+                    [ ul []
+                        (model.toppings
+                            |> Set.toList
+                            |> List.map (\topping -> li [] [ text topping ])
+                        )
+                    ]
+                ]
+            , tr []
+                [ th [] [ text "Dressing:" ]
+                , td [] [ text (dressingToString model.dressing) ]
+                ]
+            , tr []
+                [ th [] [ text "Name:" ]
+                , td [] [ text model.name ]
+                ]
+            , tr []
+                [ th [] [ text "Email:" ]
+                , td [] [ text model.email ]
+                ]
+            , tr []
+                [ th [] [ text "Phone:" ]
+                , td [] [ text model.phone ]
+                ]
+            ]
+        ]
+
+
 viewBuild : Model -> Html Msg
 viewBuild model =
     div []
-        [ case model.error of
-            Just errorMessage ->
-                div [ class "error" ] [ text errorMessage ]
-
-            Nothing ->
-                text ""
+        [ viewError model.error
         , section [ class "salad-section" ]
             [ h2 [] [ text "1. Select Base" ]
             , label [ class "select-option" ]
@@ -375,42 +410,7 @@ view model =
                 viewBuild model
 
               else
-                div [ class "confirmation" ]
-                    [ h2 [] [ text "Woo hoo!" ]
-                    , p [] [ text "Thanks for your order!" ]
-                    , table []
-                        [ tr []
-                            [ th [] [ text "Base:" ]
-                            , td [] [ text (baseToString model.base) ]
-                            ]
-                        , tr []
-                            [ th [] [ text "Toppings:" ]
-                            , td []
-                                [ ul []
-                                    (model.toppings
-                                        |> Set.toList
-                                        |> List.map (\topping -> li [] [ text topping ])
-                                    )
-                                ]
-                            ]
-                        , tr []
-                            [ th [] [ text "Dressing:" ]
-                            , td [] [ text (dressingToString model.dressing) ]
-                            ]
-                        , tr []
-                            [ th [] [ text "Name:" ]
-                            , td [] [ text model.name ]
-                            ]
-                        , tr []
-                            [ th [] [ text "Email:" ]
-                            , td [] [ text model.email ]
-                            ]
-                        , tr []
-                            [ th [] [ text "Phone:" ]
-                            , td [] [ text model.phone ]
-                            ]
-                        ]
-                    ]
+                viewConfirmation model
             ]
         ]
 
