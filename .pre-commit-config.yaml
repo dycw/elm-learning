@@ -6,7 +6,7 @@ repos:
         exclude: official-download
       - id: markdown
       - id: no-binary
-        exclude: (waterfall.jpg|official-download)
+        exclude: (waterfall.jpg|official-download|favicon.ico)
       - id: no-commit
       - id: notebook
       - id: prettier
