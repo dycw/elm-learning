@@ -172,6 +172,24 @@ errorMessage error =
             Please try again later."""
 
 
+viewStreamNotification : Feed -> Html Msg
+viewStreamNotification queue =
+    case queue of
+        [] ->
+            text ""
+
+        _ ->
+            let
+                content =
+                    "View new photos: " ++ String.fromInt (List.length queue)
+            in
+            div
+                [ class "stream-notification"
+                , onClick FlushStreamQueue
+                ]
+                [ text content ]
+
+
 viewContent : Model -> Html Msg
 viewContent model =
     case model.error of
@@ -180,7 +198,10 @@ viewContent model =
                 [ text (errorMessage error) ]
 
         Nothing ->
-            viewFeed model.feed
+            div []
+                [ viewStreamNotification model.streamQueue
+                , viewFeed model.feed
+                ]
 
 
 view : Model -> Html Msg
@@ -198,7 +219,8 @@ type Msg
     | UpdateComment Id String
     | SaveComment Id
     | LoadFeed (Result Http.Error Feed)
-    | LoadStreamPhoto String
+    | LoadStreamPhoto (Result Json.Decode.Error Photo)
+    | FlushStreamQueue
 
 
 saveNewComment : Photo -> Photo
@@ -278,11 +300,15 @@ update msg model =
         LoadFeed (Err error) ->
             ( { model | error = Just error }, Cmd.none )
 
-        LoadStreamPhoto data ->
-            let
-                _ =
-                    Debug.log "WebSocket data" data
-            in
+        LoadStreamPhoto (Ok photo) ->
+            ( { model | streamQueue = photo :: model.streamQueue }
+            , Cmd.none
+            )
+
+        LoadStreamPhoto (Err _) ->
+            ( model, Cmd.none )
+
+        FlushStreamQueue ->
             ( model, Cmd.none )
 
 
