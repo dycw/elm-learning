@@ -2,6 +2,7 @@ module AwesomeDateTest exposing (suite)
 
 import AwesomeDate as Date exposing (Date)
 import Expect
+import Fuzz exposing (Fuzzer, int, intRange)
 import Test exposing (..)
 
 
@@ -65,6 +66,14 @@ testAddYears =
             \_ ->
                 Date.addYears 1 leapDate
                     |> expectDate 2013 2 28
+        , fuzz int "changes the year by the amount given" <|
+            \years ->
+                let
+                    newDate =
+                        Date.addYears years exampleDate
+                in
+                (Date.year newDate - Date.year exampleDate)
+                    |> Expect.equal years
         ]
 
 
