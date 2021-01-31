@@ -21,4 +21,4 @@ isLeapYear year_ =
         isDivisibleBy n =
             remainderBy n year_ == 0
     in
-    isDivisibleBy 4
+    isDivisibleBy 4 && not (isDivisibleBy 100) || isDivisibleBy 400
