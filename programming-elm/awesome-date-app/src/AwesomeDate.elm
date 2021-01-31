@@ -1,4 +1,21 @@
-module AwesomeDate exposing (Date, Weekday(..), addDays, addMonths, addYears, create, daysInMonth, fromISO8601, isLeapYear, toDateString, toISO8601, weekday, weekdayToString, year)
+module AwesomeDate exposing
+    ( Date
+    , Weekday(..)
+    , addDays
+    , addMonths
+    , addYears
+    , create
+    , day
+    , daysInMonth
+    , fromISO8601
+    , isLeapYear
+    , month
+    , toDateString
+    , toISO8601
+    , weekday
+    , weekdayToString
+    , year
+    )
 
 
 type Date
@@ -15,6 +32,16 @@ year (Date date) =
     date.year
 
 
+month : Date -> Int
+month (Date date) =
+    date.month
+
+
+day : Date -> Int
+day (Date date) =
+    date.day
+
+
 isLeapYear : Int -> Bool
 isLeapYear year_ =
     let
@@ -24,16 +51,17 @@ isLeapYear year_ =
     isDivisibleBy 4 && not (isDivisibleBy 100) || isDivisibleBy 400
 
 
-addYears : Int -> Date -> Date
-addYears years (Date date) =
-    Date { date | year = date.year + years } |> preventInvalidLeapDates
-
-
 toDateString : Date -> String
 toDateString (Date date) =
     [ date.month, date.day, date.year ]
         |> List.map String.fromInt
         |> String.join "/"
+
+
+addYears : Int -> Date -> Date
+addYears years (Date date) =
+    Date { date | year = date.year + years }
+        |> preventInvalidLeapDates
 
 
 preventInvalidLeapDates : Date -> Date
