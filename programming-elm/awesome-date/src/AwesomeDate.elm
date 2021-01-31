@@ -1,4 +1,4 @@
-module AwesomeDate exposing (Date, create, isLeapYear, year)
+module AwesomeDate exposing (Date, addYears, create, isLeapYear, toDateString, year)
 
 
 type Date
@@ -22,3 +22,24 @@ isLeapYear year_ =
             remainderBy n year_ == 0
     in
     isDivisibleBy 4 && not (isDivisibleBy 100) || isDivisibleBy 400
+
+
+addYears : Int -> Date -> Date
+addYears years (Date date) =
+    Date { date | year = date.year + years } |> preventInvalidLeapDates
+
+
+toDateString : Date -> String
+toDateString (Date date) =
+    [ date.month, date.day, date.year ]
+        |> List.map String.fromInt
+        |> String.join "/"
+
+
+preventInvalidLeapDates : Date -> Date
+preventInvalidLeapDates (Date date) =
+    if not (isLeapYear date.year) && date.month == 2 && date.day >= 29 then
+        Date { date | day = 28 }
+
+    else
+        Date date
