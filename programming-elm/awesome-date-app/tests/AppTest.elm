@@ -87,6 +87,13 @@ testEvents =
                     |> Query.find [ tag "input", attribute (type_ "date") ]
                     |> Event.simulate (Event.input "2015-09-21")
                     |> Event.expect (selectDate futureDate)
+        , test "receives years offset changes" <|
+            \_ ->
+                App.view initialModel
+                    |> Query.fromHtml
+                    |> Query.find [ id "offset-years" ]
+                    |> Event.simulate (Event.input "3")
+                    |> Event.expect (changeDateOffset App.Years 3)
         ]
 
 
