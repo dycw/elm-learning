@@ -46,7 +46,13 @@ changeDateOffset field amount =
 
 testUpdate : Test
 testUpdate =
-    todo "implement update tests"
+    describe "update"
+        [ test "selects a date" <|
+            \_ ->
+                App.update (selectDate futureDate) initialModel
+                    |> Tuple.first
+                    |> Expect.equal { initialModel | selectedDate = futureDate }
+        ]
 
 
 testView : Test
