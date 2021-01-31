@@ -3,7 +3,10 @@ module AppTest exposing (suite)
 import App
 import AwesomeDate as Date exposing (Date)
 import Expect
+import Html.Attributes exposing (type_, value)
 import Test exposing (..)
+import Test.Html.Query as Query
+import Test.Html.Selector exposing (attribute, id, tag, text)
 
 
 selectedDate : Date
@@ -57,7 +60,14 @@ testUpdate =
 
 testView : Test
 testView =
-    todo "implement view tests"
+    describe "view"
+        [ test "displays the selected data" <|
+            \_ ->
+                App.view initialModel
+                    |> Query.fromHtml
+                    |> Query.find [ tag "input", attribute (type_ "date") ]
+                    |> Query.has [ attribute (value "2012-06-02") ]
+        ]
 
 
 testEvents : Test
