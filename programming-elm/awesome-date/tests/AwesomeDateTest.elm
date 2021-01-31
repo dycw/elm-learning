@@ -3,6 +3,8 @@ module AwesomeDateTest exposing (suite)
 import AwesomeDate as Date exposing (Date)
 import Expect
 import Fuzz exposing (Fuzzer, int, intRange)
+import Random
+import Shrink
 import Test exposing (..)
 
 
@@ -16,12 +18,36 @@ leapDate =
     Date.create 2012 2 29
 
 
+dateFuzzer : Fuzzer ( Int, Int, Int )
+dateFuzzer =
+    let
+        randomYear =
+            Random.int Random.minInt Random.maxInt
+
+        randomMonth =
+            Random.int 1 12
+
+        generator =
+            Random.pair randomYear randomMonth
+                |> Random.andThen
+                    (\( year, month ) ->
+                        Random.int 1 (Date.daysInMonth year month)
+                            |> Random.map (\day -> ( year, month, day ))
+                    )
+
+        shrinker dateTuple =
+            Shrink.tuple3 ( Shrink.int, Shrink.int, Shrink.int ) dateTuple
+    in
+    Fuzz.custom generator shrinker
+
+
 suite : Test
 suite =
     describe "AwesomeDate"
         [ testDateParts
         , testIsLeapYear
         , testAddYears
+        , testToDateString
         ]
 
 
@@ -91,3 +117,20 @@ expectDate year month day actualDate =
             Date.toDateString actualDate
                 ++ "\n ╷ \n │ expectDate\n ╵ \n"
                 ++ Date.toDateString expectedDate
+
+
+testToDateString : Test
+testToDateString =
+    describe "toDateString"
+        [ fuzz dateFuzzer "creates a valid date string" <|
+            \( year, month, day ) ->
+                Date.create year month day
+                    |> Date.toDateString
+                    |> Expect.equal
+                        (String.fromInt month
+                            ++ "/"
+                            ++ String.fromInt day
+                            ++ "/"
+                            ++ String.fromInt year
+                        )
+        ]
