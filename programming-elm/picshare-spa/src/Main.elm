@@ -3,6 +3,7 @@ module Main exposing (main)
 import Account
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
+import Feed as PublicFeed
 import Html exposing (Html, a, div, h1, i, text)
 import Html.Attributes exposing (class)
 import Routes
@@ -14,7 +15,7 @@ import Url exposing (Url)
 
 
 type Page
-    = PublicFeed
+    = PublicFeed PublicFeed.Model
     | Account Account.Model
     | NotFound
 
@@ -51,9 +52,9 @@ view model =
 viewContent : Page -> ( String, Html Msg )
 viewContent page =
     case page of
-        PublicFeed ->
+        PublicFeed publicFeedModel ->
             ( "Picshare"
-            , h1 [] [ text "Public Feed" ]
+            , PublicFeed.view publicFeedModel |> Html.map PublicFeedMsg
             )
 
         Account accountModel ->
@@ -75,6 +76,7 @@ type Msg
     = NewRoute (Maybe Routes.Route)
     | Visit UrlRequest
     | AccountMsg Account.Msg
+    | PublicFeedMsg PublicFeed.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -92,6 +94,15 @@ update msg model =
             , Cmd.map AccountMsg accountCmd
             )
 
+        ( PublicFeedMsg publicFeedMsg, PublicFeed publicFeedModel ) ->
+            let
+                ( updatedPublicFeedModel, publicFeedCmd ) =
+                    PublicFeed.update publicFeedMsg publicFeedModel
+            in
+            ( { model | page = PublicFeed updatedPublicFeedModel }
+            , Cmd.map PublicFeedMsg publicFeedCmd
+            )
+
         _ ->
             ( model, Cmd.none )
 
@@ -100,7 +111,13 @@ setNewPage : Maybe Routes.Route -> Model -> ( Model, Cmd Msg )
 setNewPage maybeRoute model =
     case maybeRoute of
         Just Routes.Home ->
-            ( { model | page = PublicFeed }, Cmd.none )
+            let
+                ( publicFeedModel, publicFeedCmd ) =
+                    PublicFeed.init ()
+            in
+            ( { model | page = PublicFeed publicFeedModel }
+            , Cmd.map PublicFeedMsg publicFeedCmd
+            )
 
         Just Routes.Account ->
             let
