@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Account
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
 import Html exposing (Html, a, div, h1, i, text)
@@ -14,7 +15,7 @@ import Url exposing (Url)
 
 type Page
     = PublicFeed
-    | Account
+    | Account Account.Model
     | NotFound
 
 
@@ -55,9 +56,9 @@ viewContent page =
             , h1 [] [ text "Public Feed" ]
             )
 
-        Account ->
+        Account accountModel ->
             ( "Account"
-            , h1 [] [ text "Account" ]
+            , Account.view accountModel |> Html.map AccountMsg
             )
 
         NotFound ->
@@ -73,15 +74,25 @@ viewContent page =
 type Msg
     = NewRoute (Maybe Routes.Route)
     | Visit UrlRequest
+    | AccountMsg Account.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        NewRoute maybeRoute ->
+    case ( msg, model.page ) of
+        ( NewRoute maybeRoute, _ ) ->
             setNewPage maybeRoute model
 
-        Visit urlRequest ->
+        ( AccountMsg accountMsg, Account accountModel ) ->
+            let
+                ( updatedAccountModel, accountCmd ) =
+                    Account.update accountMsg accountModel
+            in
+            ( { model | page = Account updatedAccountModel }
+            , Cmd.map AccountMsg accountCmd
+            )
+
+        _ ->
             ( model, Cmd.none )
 
 
@@ -92,7 +103,13 @@ setNewPage maybeRoute model =
             ( { model | page = PublicFeed }, Cmd.none )
 
         Just Routes.Account ->
-            ( { model | page = Account }, Cmd.none )
+            let
+                ( accountModel, accountCmd ) =
+                    Account.init
+            in
+            ( { model | page = Account accountModel }
+            , Cmd.map AccountMsg accountCmd
+            )
 
         Nothing ->
             ( { model | page = NotFound }, Cmd.none )
