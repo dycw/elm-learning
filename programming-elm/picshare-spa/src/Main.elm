@@ -134,7 +134,12 @@ setNewPage maybeRoute model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
+    case model.page of
+        PublicFeed publicFeedModel ->
+            PublicFeed.subscriptions publicFeedModel |> Sub.map PublicFeedMsg
+
+        _ ->
+            Sub.none
 
 
 
