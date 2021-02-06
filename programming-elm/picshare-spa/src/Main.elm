@@ -8,6 +8,7 @@ import Html exposing (Html, a, div, h1, i, text)
 import Html.Attributes exposing (class)
 import Routes
 import Url exposing (Url)
+import WebSocket
 
 
 
@@ -101,7 +102,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.page ) of
         ( NewRoute maybeRoute, _ ) ->
-            setNewPage maybeRoute model
+            let
+                ( updatedModel, cmd ) =
+                    setNewPage maybeRoute model
+            in
+            ( updatedModel
+            , Cmd.batch [ cmd, WebSocket.close () ]
+            )
 
         ( AccountMsg accountMsg, Account accountModel ) ->
             let

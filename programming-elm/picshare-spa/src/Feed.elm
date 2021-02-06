@@ -19,6 +19,7 @@ type alias Photo =
     , caption : String
     , liked : Bool
     , comments : List String
+    , username : String
     , newComment : String
     }
 
@@ -42,6 +43,7 @@ photoDecoder =
         |> required "caption" string
         |> required "liked" bool
         |> required "comments" (list string)
+        |> required "username" string
         |> hardcoded ""
 
 
@@ -143,6 +145,7 @@ viewDetailedPhoto photo =
         , div [ class "photo-info" ]
             [ viewLoveButton photo
             , h2 [ class "caption" ] [ text photo.caption ]
+            , h3 [ class "username" ] [ a [] [ text ("@" ++ photo.username) ] ]
             , viewComments photo
             ]
         ]
