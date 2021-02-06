@@ -32,6 +32,7 @@ type alias Model =
     { feed : Maybe Feed
     , error : Maybe Http.Error
     , streamQueue : Feed
+    , wsUrl : Maybe String
     }
 
 
@@ -47,33 +48,24 @@ photoDecoder =
         |> hardcoded ""
 
 
-baseUrl : String
-baseUrl =
-    "https://programming-elm.com/"
-
-
-wsUrl : String
-wsUrl =
-    "wss://programming-elm.com/"
-
-
-initialModel : Model
-initialModel =
+initialModel : Maybe String -> Model
+initialModel wsUrl =
     { feed = Nothing
     , error = Nothing
     , streamQueue = []
+    , wsUrl = wsUrl
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( initialModel, fetchFeed )
+init : { feedUrl : String, wsUrl : Maybe String } -> ( Model, Cmd Msg )
+init { feedUrl, wsUrl } =
+    ( initialModel wsUrl, fetchFeed feedUrl )
 
 
-fetchFeed : Cmd Msg
-fetchFeed =
+fetchFeed : String -> Cmd Msg
+fetchFeed url =
     Http.get
-        { url = baseUrl ++ "feed"
+        { url = url
         , expect = Http.expectJson LoadFeed (list photoDecoder)
         }
 
@@ -266,6 +258,16 @@ updateFeed updatePhoto id maybeFeed =
     Maybe.map (updatePhotoById updatePhoto id) maybeFeed
 
 
+listenForNewPhotos : Maybe String -> Cmd Msg
+listenForNewPhotos maybeWsUrl =
+    case maybeWsUrl of
+        Just wsUrl ->
+            WebSocket.listen wsUrl
+
+        Nothing ->
+            Cmd.none
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -292,7 +294,7 @@ update msg model =
 
         LoadFeed (Ok feed) ->
             ( { model | feed = Just feed }
-            , WebSocket.listen wsUrl
+            , listenForNewPhotos model.wsUrl
             )
 
         LoadFeed (Err error) ->
