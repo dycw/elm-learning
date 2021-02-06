@@ -1,22 +1,31 @@
 module Routes exposing (Route(..), href, match)
 
+-- START:import.Url.Parser
+
 import Html
 import Html.Attributes
 import Url exposing (Url)
-import Url.Parser as Parser exposing (Parser)
+import Url.Parser as Parser exposing ((</>), Parser)
+
+
+
+-- END:import.Url.Parser
 
 
 type Route
     = Home
     | Account
+      -- START:type.Route
+    | UserFeed String
 
 
-routes : Parser (Route -> a) a
-routes =
-    Parser.oneOf
-        [ Parser.map Home Parser.top
-        , Parser.map Account (Parser.s "account")
-        ]
+
+-- END:type.Route
+
+
+href : Route -> Html.Attribute msg
+href route =
+    Html.Attributes.href (routeToUrl route)
 
 
 match : Url -> Maybe Route
@@ -33,7 +42,31 @@ routeToUrl route =
         Account ->
             "/account"
 
+        -- START:routeToUrl.UserFeed
+        UserFeed username ->
+            "/user/" ++ username ++ "/feed"
 
-href : Route -> Html.Attribute msg
-href route =
-    Html.Attributes.href (routeToUrl route)
+
+
+-- END:routeToUrl.UserFeed
+
+
+routes : Parser (Route -> a) a
+
+
+
+-- START:routes
+
+
+routes =
+    Parser.oneOf
+        [ Parser.map Home Parser.top
+        , Parser.map Account (Parser.s "account")
+        , Parser.map
+            UserFeed
+            (Parser.s "user" </> Parser.string </> Parser.s "feed")
+        ]
+
+
+
+-- END:routes
