@@ -3,11 +3,12 @@ module Main exposing (main)
 import Account
 import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Navigation
-import Feed as PublicFeed
 import Html exposing (Html, a, div, h1, i, text)
 import Html.Attributes exposing (class)
-import Routes
+import PublicFeed
+import Routes exposing (Route(..))
 import Url exposing (Url)
+import UserFeed
 import WebSocket
 
 
@@ -17,6 +18,7 @@ import WebSocket
 
 type Page
     = PublicFeed PublicFeed.Model
+    | UserFeed String UserFeed.Model
     | Account Account.Model
     | NotFound
 
@@ -58,6 +60,11 @@ viewContent page =
             , PublicFeed.view publicFeedModel |> Html.map PublicFeedMsg
             )
 
+        UserFeed username userFeedModel ->
+            ( "User Feed for @" ++ username
+            , UserFeed.view userFeedModel |> Html.map UserFeedMsg
+            )
+
         Account accountModel ->
             ( "Account"
             , Account.view accountModel |> Html.map AccountMsg
@@ -96,6 +103,7 @@ type Msg
     | Visit UrlRequest
     | AccountMsg Account.Msg
     | PublicFeedMsg PublicFeed.Msg
+    | UserFeedMsg UserFeed.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -141,10 +149,19 @@ setNewPage maybeRoute model =
         Just Routes.Home ->
             let
                 ( publicFeedModel, publicFeedCmd ) =
-                    PublicFeed.init ()
+                    PublicFeed.init
             in
             ( { model | page = PublicFeed publicFeedModel }
             , Cmd.map PublicFeedMsg publicFeedCmd
+            )
+
+        Just (Routes.UserFeed username) ->
+            let
+                ( userFeedModel, userFeedCmd ) =
+                    UserFeed.init username
+            in
+            ( { model | page = UserFeed username userFeedModel }
+            , Cmd.map UserFeedMsg userFeedCmd
             )
 
         Just Routes.Account ->
