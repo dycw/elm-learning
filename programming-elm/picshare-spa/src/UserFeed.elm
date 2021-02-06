@@ -12,9 +12,18 @@ type alias Msg =
     Feed.Msg
 
 
+
+-- START:feedUrl
+
+
 feedUrl : String -> String
 feedUrl username =
     "https://programming-elm.com/user/" ++ username ++ "/feed"
+
+
+
+-- END:feedUrl
+-- START:init
 
 
 init : String -> ( Model, Cmd Msg )
@@ -23,6 +32,10 @@ init username =
         { feedUrl = feedUrl username
         , wsUrl = Nothing
         }
+
+
+
+-- END:init
 
 
 view : Model -> Html Msg
