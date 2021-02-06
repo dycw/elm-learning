@@ -45,7 +45,7 @@ view model =
             viewContent model.page
     in
     { title = title
-    , body = [ content ]
+    , body = [ viewHeader, content ]
     }
 
 
@@ -66,6 +66,24 @@ viewContent page =
             ( "Not Found"
             , div [ class "not-found" ] [ h1 [] [ text "Page Not Found" ] ]
             )
+
+
+viewHeader : Html Msg
+viewHeader =
+    div [ class "header" ]
+        [ div [ class "header-nav" ]
+            [ a
+                [ class "nav-brand"
+                , Routes.href Routes.Home
+                ]
+                [ text "Picshare" ]
+            , a
+                [ class "nav-accound"
+                , Routes.href Routes.Account
+                ]
+                [ i [ class "fa fa-2x fa-gear" ] [] ]
+            ]
+        ]
 
 
 
@@ -102,6 +120,9 @@ update msg model =
             ( { model | page = PublicFeed updatedPublicFeedModel }
             , Cmd.map PublicFeedMsg publicFeedCmd
             )
+
+        ( Visit (Browser.Internal url), _ ) ->
+            ( model, Navigation.pushUrl model.navigationKey (Url.toString url) )
 
         _ ->
             ( model, Cmd.none )
