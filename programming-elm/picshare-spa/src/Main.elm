@@ -136,6 +136,15 @@ update msg model =
             , Cmd.map PublicFeedMsg publicFeedCmd
             )
 
+        ( UserFeedMsg userFeedMsg, UserFeed username userFeedModel ) ->
+            let
+                ( updatedUserFeedModel, userFeedCmd ) =
+                    UserFeed.update userFeedMsg userFeedModel
+            in
+            ( { model | page = UserFeed username updatedUserFeedModel }
+            , Cmd.map UserFeedMsg userFeedCmd
+            )
+
         ( Visit (Browser.Internal url), _ ) ->
             ( model, Navigation.pushUrl model.navigationKey (Url.toString url) )
 
