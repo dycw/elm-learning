@@ -1,7 +1,0 @@
-{
-  "python.pythonPath": "/home/derek/miniconda3/envs/elm-learning/bin/python",
-  "files.exclude": {
-    "**/official-download": true,
-    "**/official-repo": true
-  }
-}
