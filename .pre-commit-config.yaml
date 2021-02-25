@@ -3,6 +3,8 @@ repos:
     rev: v0.8.2
     hooks:
       - id: elmformat
+        args:
+          - --yes
   - repo: https://github.com/markdownlint/markdownlint
     rev: v0.11.0
     hooks:
